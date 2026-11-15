@@ -240,9 +240,44 @@
       .final-cta{padding:60px 0}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+  
+  /* Apertura cinematografica: video del progetto ciclovia */
+  body.cycle-intro-open{overflow:hidden}
+  .cycle-intro{position:fixed;inset:0;z-index:100000;background:#0c1a13;color:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:Inter,Arial,sans-serif}
+  .cycle-intro[hidden]{display:none!important}
+  .cycle-intro::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#06130ca8 0%,#06130c15 31%,#06130c13 60%,#06130cdc 100%);z-index:1;pointer-events:none}
+  .cycle-intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;transition:opacity .6s ease;background:#0e261d}
+  .cycle-intro.is-ready .cycle-intro-video{opacity:1}
+  .cycle-intro-header{position:absolute;top:clamp(26px,7vh,72px);left:6vw;right:6vw;z-index:2;text-align:center;text-shadow:0 3px 20px #000a}
+  .cycle-intro-tag{display:inline-block;margin:0 0 14px;color:#e6ffb4;font-size:clamp(10px,1.3vw,14px);font-weight:850;text-transform:uppercase;letter-spacing:.25em}
+  .cycle-intro-header h2{font-size:clamp(2rem,6.5vw,6.2rem);letter-spacing:-.052em;line-height:.94;font-weight:950;color:#fff;margin:0 0 15px;text-shadow:0 4px 18px #000c}
+  .cycle-intro-header p{font-size:clamp(.7rem,1.55vw,1.15rem);font-weight:800;letter-spacing:.18em;color:#e9ffbe;margin:0;text-transform:uppercase}
+  .cycle-intro-footer{position:absolute;left:18px;right:18px;bottom:max(24px,env(safe-area-inset-bottom,0px) + 20px);z-index:3;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;flex-direction:column}
+  .cycle-intro-enter{min-height:56px;border:1px solid #e5ff9a;border-radius:100px;padding:17px 34px;color:#10281f;background:#d5f478;font-size:clamp(.83rem,1.4vw,1.03rem);letter-spacing:.06em;font-weight:950;box-shadow:0 8px 38px #0008;cursor:pointer}
+  .cycle-intro-enter:hover,.cycle-intro-enter:focus-visible{background:#efffca;transform:translateY(-2px)}
+  .cycle-intro-tools{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+  .cycle-intro-audio{border:1px solid #fff8;border-radius:100px;background:#0b1d15bb;color:white;padding:9px 15px;cursor:pointer;font-size:.8rem}
+  .cycle-intro-audio[hidden]{display:none}
+  .cycle-intro-status{font-size:.74rem;color:#f7f7efc9;min-height:1.15em;text-align:center;text-shadow:0 2px 8px #000}
+  .cycle-intro-disclaimer{position:absolute;bottom:8px;left:10px;right:10px;text-align:center;z-index:3;font-size:.62rem;color:#fff9;text-shadow:0 1px 8px #000;pointer-events:none}
+  @media(max-width:690px){.cycle-intro-video{object-fit:contain}.cycle-intro-header{top:9vh;left:4vw;right:4vw}.cycle-intro-header h2{font-size:clamp(2rem,9vw,3.1rem)}.cycle-intro-header p{font-size:.65rem}.cycle-intro-footer{bottom:45px}.cycle-intro-enter{width:min(92vw,350px)}}
+  @media(prefers-reduced-motion:reduce){.cycle-intro-video{transition:none}.cycle-intro-enter:hover{transform:none}}
+
   </style>
 </head>
 <body>
+
+  <section id="cycleIntro" class="cycle-intro" role="dialog" aria-modal="true" aria-label="Video di presentazione Una ciclovia per la vita">
+    <video id="cycleIntroVideo" class="cycle-intro-video" muted playsinline loop preload="none" aria-label="Animazione della proposta di pista ciclabile sul vecchio tracciato ferroviario"></video>
+    <div class="cycle-intro-header"><span class="cycle-intro-tag">Una proposta per il nostro territorio</span><h2>UNA CICLOVIA<br>PER LA VITA</h2><p>Chivasso – Asti · 51 km di opportunità</p></div>
+    <div class="cycle-intro-footer">
+      <button id="cycleIntroEnter" class="cycle-intro-enter" type="button">ENTRA NEL PROGETTO &nbsp;→</button>
+      <div class="cycle-intro-tools"><button id="cycleIntroAudio" class="cycle-intro-audio" type="button" hidden>♪ Attiva audio</button><span id="cycleIntroStatus" class="cycle-intro-status" aria-live="polite">Caricamento del video… puoi entrare in qualsiasi momento</span></div>
+    </div>
+    <div class="cycle-intro-disclaimer">Simulazione illustrativa di una proposta civica, non un progetto approvato</div>
+  </section>
+  <noscript><style>#cycleIntro{display:none!important}</style></noscript>
+
   <a class="skip" href="#contenuto">Vai al contenuto</a>
   <header class="site-header">
     <div class="notice">INIZIATIVA CIVICA INDIPENDENTE · PROPOSTA IN PREPARAZIONE · NESSUNA PETIZIONE UFFICIALE ANCORA DEPOSITATA</div>
@@ -427,5 +462,74 @@
       });
     })();
   </script>
+
+  <script>
+    /* Video originale trasferito in 16 segmenti binari per ospitare il filmato su GitHub Pages.
+       I segmenti sono concatenati senza ricodifica durante la riproduzione nel browser. */
+    (function(){
+      'use strict';
+      const intro=document.getElementById('cycleIntro');
+      const video=document.getElementById('cycleIntroVideo');
+      const enter=document.getElementById('cycleIntroEnter');
+      const audio=document.getElementById('cycleIntroAudio');
+      const status=document.getElementById('cycleIntroStatus');
+      const segmentCount=16;
+      let objectUrl=null;
+      let closed=false;
+      let aborter=null;
+      document.body.classList.add('cycle-intro-open');
+      function closeIntro(){
+        if(closed)return;
+        closed=true;
+        intro.hidden=true;
+        document.body.classList.remove('cycle-intro-open');
+        video.pause();
+        if(aborter)aborter.abort();
+        if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}
+        const first=document.getElementById('contenuto');
+        if(first)first.setAttribute('tabindex','-1');
+      }
+      enter.addEventListener('click',closeIntro);
+      document.addEventListener('keydown',function(e){if(!closed&&e.key==='Escape')closeIntro();});
+      audio.addEventListener('click',async function(){
+        video.muted=!video.muted;
+        audio.textContent=video.muted?'♪ Attiva audio':'♪ Disattiva audio';
+        if(video.paused){try{await video.play();}catch(e){status.textContent='Tocca il video per avviare la riproduzione';}}
+      });
+      async function loadVideo(){
+        aborter=new AbortController();
+        const controller=aborter;
+        try{
+          const urls=Array.from({length:segmentCount},(_,i)=>'assets/intro/segment-'+String(i).padStart(2,'0')+'.bin');
+          const pieces=await Promise.all(urls.map(async url=>{
+            const response=await fetch(url,{signal:controller.signal});
+            if(!response.ok)throw new Error('Risorsa video mancante: '+url);
+            return response.arrayBuffer();
+          }));
+          if(closed)return;
+          const blob=new Blob(pieces,{type:'video/mp4'});
+          if(blob.size!==8209875)throw new Error('Video incompleto');
+          objectUrl=URL.createObjectURL(blob);
+          video.src=objectUrl;
+          video.load();
+          video.addEventListener('loadeddata',async function(){
+            if(closed)return;
+            intro.classList.add('is-ready');
+            audio.hidden=false;
+            status.textContent='Premi «Entra nel progetto» per proseguire';
+            try{await video.play();}catch(e){status.textContent='Tocca il video per riprodurlo';}
+          },{once:true});
+          video.addEventListener('error',function(){if(!closed)status.textContent='Video non disponibile. Puoi comunque entrare nel progetto.';},{once:true});
+          video.addEventListener('click',function(){if(video.paused)video.play().catch(()=>{});});
+        }catch(e){
+          if(closed||e.name==='AbortError')return;
+          status.textContent='Video temporaneamente non disponibile. Puoi comunque entrare nel progetto.';
+          console.warn('Introduzione video:',e);
+        }
+      }
+      loadVideo();
+    })();
+  </script>
+
 </body>
 </html>
