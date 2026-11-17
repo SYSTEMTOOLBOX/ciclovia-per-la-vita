@@ -22,7 +22,7 @@ comunque di un servizio backend: **GitHub Pages è un hosting statico**.
 4. Firebase console > Build > Firestore Database: creare il database in regione UE appropriata, modalità di produzione. Non attivare regole pubbliche.
 5. Firestore > Rules: **incollare integralmente** `firestore.rules` e pubblicare. Verificare le regole con l'emulatore prima di raccogliere dati reali.
 6. Project settings > Your apps > Web app: ottenere i valori web e inserirli in `firebase-config.js`. Questi campi pubblici NON sono password. Non inserire nel repository credenziali admin, service account o chiavi segrete.
-7. Pubblicare sul branch principale, dopo aver finalizzato e approvato l'informativa GDPR, i ruoli del fornitore, il periodo di conservazione e il metodo di cancellazione dei dati e account.
+7. Prima di aprire la raccolta, finalizzare e approvare l'informativa GDPR, i ruoli del fornitore, il periodo di conservazione e il metodo di cancellazione dei dati e degli account. **Solo dopo i test** impostare `launchEnabled = true` in `firebase-config.js` e pubblicare sul branch principale.
 8. Verificare da **due browser/account**: registrazione, email di verifica, registrazione vera, blocco account non verificato, assenza di accesso ai dati altrui, revoca e accesso successivo.
 9. Eseguire controlli anti-abuso e predisporre risposte GDPR: le regole non impediscono a una stessa persona di usare due email diverse e non attestano l'identità.
 
