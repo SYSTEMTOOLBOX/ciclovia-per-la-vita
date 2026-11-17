@@ -2,6 +2,9 @@
 // I valori qui sotto NON sono credenziali segrete: la protezione dei dati
 // dipende dalle regole Firestore distribuite nel progetto Firebase.
 // Senza configurazione, il modulo rimane disattivato.
+// Attivare solo dopo privacy approvata e test finali.
+export const launchEnabled = false;
+
 export const firebaseConfig = {
   apiKey: "",
   authDomain: "",
