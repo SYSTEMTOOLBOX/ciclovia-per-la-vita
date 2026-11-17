@@ -101,7 +101,7 @@
       <label class="tick"><input id="adulto" type="checkbox" required><span>Dichiaro di avere almeno 18 anni.</span></label>
       <label class="tick"><input id="consenso" type="checkbox" required><span>Esprimo il mio <strong>consenso esplicito</strong> al trattamento dei dati per registrare la mia adesione volontaria alla proposta civica, anche laddove l'adesione possa rivelare opinioni politiche, secondo l'<a href="privacy.html" target="_blank" rel="noopener">informativa privacy</a>. So che posso revocarlo.</span></label>
       <p class="muted">Non riceverai pubblicità. Il titolare del trattamento sarà Loris Nordio, promotore come privato cittadino. Contatto: <a href="mailto:kaironlabsstudio@gmail.com">kaironlabsstudio@gmail.com</a>.</p>
-      <div class="actions"><button class="btn" id="save-adhesion" type="submit">Confermo la mia adesione</button><button class="btn secondary log-out" type="button">Esci</button></div>
+      <div class="actions"><button class="btn" id="save-adhesion" type="submit">Confermo la mia adesione</button><button class="btn danger delete-account" type="button">Elimina il mio account</button><button class="btn secondary log-out" type="button">Esci</button></div>
     </form>
   </section>
 
@@ -111,7 +111,7 @@
     <p class="muted" id="existing-details"></p>
     <div class="actions">
       <button class="btn danger" id="delete-adhesion" type="button">Revoca la mia adesione</button>
-      <button class="btn secondary" id="delete-account" type="button">Elimina anche il mio account</button>
+      <button class="btn secondary delete-account" type="button">Elimina anche il mio account</button>
       <button class="btn secondary log-out" type="button">Esci</button>
     </div>
   </section>
@@ -240,6 +240,7 @@
         await setDoc(doc(db,"adesioni",user.uid),{
           nome,cognome,comune,email:user.email,
           consensoEsplicito:true,
+          maggiorenne:true,
           privacyVersion:"2026-11-17-v1",
           creataIl:serverTimestamp()
         });
@@ -254,14 +255,14 @@
       await refreshPanel();
       status("Adesione revocata e rimossa dall'archivio. L'account rimane attivo.");
     }));
-    $("delete-account").addEventListener("click",()=>guarded(async()=>{
+    document.querySelectorAll(".delete-account").forEach(button => button.addEventListener("click",()=>guarded(async()=>{
       if (!confirm("Eliminare l'account e la tua adesione? L'operazione non è reversibile.")) return;
       const user=auth.currentUser;
       await deleteDoc(doc(db,"adesioni",user.uid));
       await deleteUser(user);
       show("account");
       status("Adesione e account eliminati.");
-    }));
+    })));
   }
 </script>
 </body>
