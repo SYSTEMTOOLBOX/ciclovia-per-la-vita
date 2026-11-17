@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Adesioni CIVICHE private, NON firme autenticate.
+    // Un documento per account Firebase con email verificata.
+    match /adesioni/{userId} {
+      function ownsRecord() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      function validInput() {
+        let d = request.resource.data;
+        return d.keys().hasOnly([
+          'nome', 'cognome', 'comune', 'email', 'consensoEsplicito',
+          'privacyVersion', 'creataIl'
+        ])
+        && d.keys().hasAll([
+          'nome', 'cognome', 'comune', 'email', 'consensoEsplicito',
+          'privacyVersion', 'creataIl'
+        ])
+        && d.nome is string && d.nome.size() >= 2 && d.nome.size() <= 60
+        && d.cognome is string && d.cognome.size() >= 2 && d.cognome.size() <= 60
+        && d.comune is string && d.comune.size() >= 2 && d.comune.size() <= 80
+        && d.email is string && d.email == request.auth.token.email
+        && request.auth.token.email_verified == true
+        && d.consensoEsplicito == true
+        && d.privacyVersion == '2026-11-17-v1'
+        && d.creataIl == request.time;
+      }
+      allow create: if ownsRecord() && validInput();
+      allow get: if ownsRecord();
+      allow delete: if ownsRecord(); // revoca senza intervento dell'amministratore
+      allow list, update: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
