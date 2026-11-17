@@ -1,0 +1,12 @@
+# Non salvare dati personali, backup o segreti nel repo pubblico.
+*.sqlite
+*.sqlite3
+*.db
+*.csv
+*.xlsx
+.env
+.env.*
+!.env.example
+service-account*.json
+*firebase-adminsdk*.json
+firebase-debug.log
