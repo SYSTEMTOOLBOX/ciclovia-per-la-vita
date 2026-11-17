@@ -121,8 +121,8 @@
 <footer><div class="wrap" style="margin:0 auto">© 2026 Una ciclovia per la vita · Chivasso–Asti · Promotore Loris Nordio, privato cittadino · <a href="./">Torna al sito</a></div></footer>
 
 <script type="module">
-  import { firebaseConfig } from "./firebase-config.js";
-  const configured = ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
+  import { firebaseConfig, launchEnabled } from "./firebase-config.js";
+  const configured = launchEnabled === true && ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
   const $ = id => document.getElementById(id);
   const panels = ["setup","account","verification","new-adhesion","existing-adhesion"];
   const show = id => panels.forEach(name => $(name).hidden = name !== id);
