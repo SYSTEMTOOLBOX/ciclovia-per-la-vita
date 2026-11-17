@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10281f">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Adesioni civiche di sostegno alla proposta Una ciclovia per la vita – Chivasso–Asti.">
+  <title>Aderisci | Una ciclovia per la vita</title>
+  <style>
+    :root {font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#14382a;background:#f6f7ec}
+    * {box-sizing:border-box}
+    body {margin:0}
+    [hidden] {display:none!important}
+    .top {background:#10281f;color:white;padding:20px max(20px,calc((100% - 920px)/2))}
+    .top a {color:#d7f58a;text-decoration:none;font-weight:800}
+    .wrap {width:min(920px,calc(100% - 32px));margin:42px auto 76px}
+    .eyebrow {text-transform:uppercase;letter-spacing:.15em;font-size:.78rem;font-weight:850;color:#53704d}
+    h1 {font-size:clamp(2.2rem,6vw,4.6rem);line-height:1.07;letter-spacing:-.045em;margin:14px 0}
+    h2 {font-size:1.4rem}
+    p {line-height:1.65}
+    .lead {max-width:680px;color:#52675b;font-size:1.09rem}
+    .card {background:white;border:1px solid #d7e3d2;border-radius:18px;padding:clamp(22px,4vw,36px);margin-top:25px;box-shadow:0 13px 44px #132b1a0c}
+    label {display:block;font-weight:700;font-size:.94rem;margin:17px 0 6px}
+    input,select {display:block;border:1px solid #afc1b1;border-radius:10px;font:inherit;padding:13px;width:100%;background:white;color:#142e22;min-height:46px}
+    input:focus,select:focus,button:focus-visible {outline:3px solid #badf62;outline-offset:2px}
+    .grid {display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+    .tick {display:flex;gap:12px;align-items:flex-start;margin:17px 0;line-height:1.55;font-size:.91rem;font-weight:500}
+    .tick input {width:20px;height:20px;flex:0 0 20px;margin-top:2px;min-height:unset}
+    .btn {border:0;background:#143e2d;color:white;border-radius:100px;padding:13px 23px;font:inherit;font-weight:800;min-height:48px;cursor:pointer}
+    .btn:hover {background:#245b3d}
+    .btn:disabled {cursor:wait;opacity:.55}
+    .secondary {background:#edf4e4;color:#143e2d}
+    .secondary:hover {background:#dcecc6}
+    .danger {background:#fff1f0;color:#963b32}
+    .danger:hover {background:#ffe5e2}
+    .actions {display:flex;flex-wrap:wrap;gap:10px;margin:21px 0 0}
+    a {color:#16643b}
+    .note {border-left:4px solid #98bf63;background:#eff5e6;border-radius:0 10px 10px 0;padding:14px 18px;font-size:.93rem;line-height:1.6}
+    .warning {border-left-color:#cc9651;background:#fff4dd}
+    #feedback {padding:14px 18px;border-radius:9px;background:#e6f0df;margin:20px 0;line-height:1.5}
+    #feedback.error {background:#ffebe7;color:#853627}
+    .muted {font-size:.9rem;color:#5c6c63}
+    footer {border-top:1px solid #d5e1d1;padding:20px;color:#60736a;font-size:.83rem;line-height:1.6}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}.wrap{margin-top:28px}}
+  </style>
+</head>
+<body>
+<header class="top"><a href="./">← UNA CICLOVIA PER LA VITA · CHIVASSO–ASTI</a></header>
+<main class="wrap">
+  <div class="eyebrow">Partecipazione civica indipendente</div>
+  <h1>La tua adesione<br>per la ciclovia.</h1>
+  <p class="lead">Sostieni la richiesta di valutare una ciclovia lungo il tracciato Chivasso–Asti. Nessuna firma viene pubblicata. La partecipazione è volontaria.</p>
+  <p class="note warning"><strong>Attenzione:</strong> queste sono adesioni digitali di sostegno civico, non firme autenticate per una petizione ufficiale alla Regione Piemonte.</p>
+  <p id="feedback" role="status" aria-live="polite" hidden></p>
+
+  <section class="card" id="setup" hidden aria-labelledby="setup-title">
+    <h2 id="setup-title">Adesioni online non ancora aperte</h2>
+    <p>Il sito è disponibile anche quando il computer del promotore è spento. La raccolta è disattivata finché non viene configurato il servizio di registrazione protetta e completata l'informativa privacy.</p>
+    <p>Nel frattempo puoi <a href="./">conoscere e condividere la proposta</a>.</p>
+  </section>
+
+  <section class="card" id="account" hidden aria-labelledby="account-title">
+    <h2 id="account-title">Registrati o accedi</h2>
+    <p class="muted">Per evitare registrazioni anonime è richiesta una casella email verificata. Inserisci una password di almeno 6 caratteri. Le tue informazioni non saranno pubbliche.</p>
+    <form id="account-form">
+      <label for="account-email">Email</label>
+      <input id="account-email" type="email" autocomplete="email" required maxlength="254">
+      <label for="account-password">Password</label>
+      <input id="account-password" type="password" autocomplete="current-password" required minlength="6" maxlength="128">
+      <div class="actions">
+        <button class="btn" id="create-account" type="button">Registrati</button>
+        <button class="btn secondary" id="sign-in" type="submit">Accedi</button>
+        <button class="btn secondary" id="reset-password" type="button">Password dimenticata</button>
+      </div>
+    </form>
+    <p class="muted">La creazione dell'account serve per la verifica email; non registra automaticamente l'adesione.</p>
+  </section>
+
+  <section class="card" id="verification" hidden aria-labelledby="verification-title">
+    <h2 id="verification-title">Conferma l'indirizzo email</h2>
+    <p>Ti è stata inviata un'email con un link di verifica. Aprilo, poi torna qui e premi «Ho verificato l'email». Se non trovi il messaggio, controlla anche lo spam.</p>
+    <p class="muted" id="verification-address"></p>
+    <div class="actions">
+      <button class="btn" id="check-verification" type="button">Ho verificato l'email</button>
+      <button class="btn secondary" id="resend-verification" type="button">Invia di nuovo</button>
+      <button class="btn secondary log-out" type="button">Esci</button>
+    </div>
+  </section>
+
+  <section class="card" id="new-adhesion" hidden aria-labelledby="adhesion-title">
+    <h2 id="adhesion-title">Aderisci alla proposta</h2>
+    <p class="muted" id="verified-address"></p>
+    <form id="adhesion-form">
+      <div class="grid">
+        <div><label for="nome">Nome</label><input id="nome" name="nome" autocomplete="given-name" required minlength="2" maxlength="60"></div>
+        <div><label for="cognome">Cognome</label><input id="cognome" name="cognome" autocomplete="family-name" required minlength="2" maxlength="60"></div>
+      </div>
+      <label for="comune">Comune di riferimento</label>
+      <input id="comune" name="comune" placeholder="Es. Lauriano" required minlength="2" maxlength="80">
+      <label class="tick"><input id="adulto" type="checkbox" required><span>Dichiaro di avere almeno 18 anni.</span></label>
+      <label class="tick"><input id="consenso" type="checkbox" required><span>Esprimo il mio <strong>consenso esplicito</strong> al trattamento dei dati per registrare la mia adesione volontaria alla proposta civica, anche laddove l'adesione possa rivelare opinioni politiche, secondo l'<a href="privacy.html" target="_blank" rel="noopener">informativa privacy</a>. So che posso revocarlo.</span></label>
+      <p class="muted">Non riceverai pubblicità. Il titolare del trattamento sarà Loris Nordio, promotore come privato cittadino. Contatto: <a href="mailto:kaironlabsstudio@gmail.com">kaironlabsstudio@gmail.com</a>.</p>
+      <div class="actions"><button class="btn" id="save-adhesion" type="submit">Confermo la mia adesione</button><button class="btn secondary log-out" type="button">Esci</button></div>
+    </form>
+  </section>
+
+  <section class="card" id="existing-adhesion" hidden aria-labelledby="existing-title">
+    <h2 id="existing-title">Hai già aderito</h2>
+    <p>La tua adesione civica è registrata in modo privato. Sul sito non appariranno nome, cognome o email.</p>
+    <p class="muted" id="existing-details"></p>
+    <div class="actions">
+      <button class="btn danger" id="delete-adhesion" type="button">Revoca la mia adesione</button>
+      <button class="btn secondary" id="delete-account" type="button">Elimina anche il mio account</button>
+      <button class="btn secondary log-out" type="button">Esci</button>
+    </div>
+  </section>
+
+  <p class="muted">Progetto civico indipendente, non gestito dalla Regione Piemonte. <a href="privacy.html">Informativa sul trattamento dei dati</a>.</p>
+</main>
+<footer><div class="wrap" style="margin:0 auto">© 2026 Una ciclovia per la vita · Chivasso–Asti · Promotore Loris Nordio, privato cittadino · <a href="./">Torna al sito</a></div></footer>
+
+<script type="module">
+  import { firebaseConfig } from "./firebase-config.js";
+  const configured = ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
+  const $ = id => document.getElementById(id);
+  const panels = ["setup","account","verification","new-adhesion","existing-adhesion"];
+  const show = id => panels.forEach(name => $(name).hidden = name !== id);
+  const status = (message, error = false) => {
+    const box = $("feedback");
+    box.textContent = message;
+    box.classList.toggle("error", error);
+    box.hidden = !message;
+    if (message) box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+  function explain(error) {
+    const code = error?.code || "";
+    const errors = {
+      "auth/email-already-in-use": "Questa email è già registrata. Usa il pulsante Accedi.",
+      "auth/invalid-email": "Controlla l'indirizzo email.",
+      "auth/weak-password": "Scegli una password più lunga.",
+      "auth/invalid-credential": "Email o password non riconosciute.",
+      "auth/too-many-requests": "Troppi tentativi: riprova più tardi.",
+      "auth/requires-recent-login": "Per eliminare l'account effettua di nuovo l'accesso.",
+      "permission-denied": "Salvataggio non autorizzato: verifica la configurazione e le regole."
+    };
+    return errors[code] || "Operazione non riuscita. Riprova o contatta il promotore se il problema continua.";
+  }
+  if (!configured) {
+    show("setup");
+  } else {
+    const [
+      { initializeApp },
+      { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, reload, signOut, sendPasswordResetEmail, deleteUser },
+      { getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp }
+    ] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js")
+    ]);
+    const auth = getAuth(initializeApp(firebaseConfig));
+    const db = getFirestore();
+    let busy = false;
+    async function guarded(fn) {
+      if (busy) return;
+      busy = true;
+      document.querySelectorAll("button").forEach(b => b.disabled = true);
+      status("");
+      try { await fn(); }
+      catch (e) { console.warn("Adesioni:",e?.code||"error"); status(explain(e),true); }
+      finally { busy = false; document.querySelectorAll("button").forEach(b => b.disabled = false); }
+    }
+    async function refreshPanel() {
+      const user = auth.currentUser;
+      if (!user) { show("account"); return; }
+      await reload(user);
+      await user.getIdToken(true);
+      if (!user.emailVerified) {
+        $("verification-address").textContent = user.email || "";
+        show("verification");
+        return;
+      }
+      const snapshot = await getDoc(doc(db, "adesioni", user.uid));
+      if (snapshot.exists()) {
+        $("existing-details").textContent = "Email verificata: " + (user.email || "") + ". Puoi ritirare il consenso e cancellare l'adesione.";
+        show("existing-adhesion");
+      } else {
+        $("verified-address").textContent = "Email verificata: " + (user.email || "");
+        show("new-adhesion");
+      }
+    }
+    onAuthStateChanged(auth,()=>guarded(refreshPanel), error => status(explain(error),true));
+    $("create-account").addEventListener("click",()=>guarded(async()=>{
+      const email = $("account-email").value.trim();
+      const password = $("account-password").value;
+      if (!$("account-email").checkValidity() || !$("account-password").checkValidity()) {
+        $("account-form").reportValidity(); return;
+      }
+      const { user } = await createUserWithEmailAndPassword(auth,email,password);
+      await sendEmailVerification(user);
+      $("account-password").value = "";
+      await refreshPanel();
+      status("Account creato. Controlla la tua email per verificare l'indirizzo.");
+    }));
+    $("account-form").addEventListener("submit",e=>{
+      e.preventDefault(); guarded(async()=>{
+        const email = $("account-email").value.trim(), password = $("account-password").value;
+        await signInWithEmailAndPassword(auth,email,password);
+        $("account-password").value = "";
+        await refreshPanel();
+      });
+    });
+    $("reset-password").addEventListener("click",()=>guarded(async()=>{
+      const email=$("account-email").value.trim();
+      if (!$("account-email").checkValidity()) { $("account-email").reportValidity(); return; }
+      await sendPasswordResetEmail(auth,email);
+      status("Se l'indirizzo è registrato, riceverai istruzioni per reimpostare la password.");
+    }));
+    $("check-verification").addEventListener("click",()=>guarded(async()=>{
+      await refreshPanel();
+      if (!auth.currentUser?.emailVerified) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
+    }));
+    $("resend-verification").addEventListener("click",()=>guarded(async()=>{
+      await sendEmailVerification(auth.currentUser);
+      status("Nuova email di verifica inviata. Controlla la posta.");
+    }));
+    document.querySelectorAll(".log-out").forEach(button=>button.addEventListener("click",()=>guarded(async()=>{
+      await signOut(auth); show("account");
+    })));
+    $("adhesion-form").addEventListener("submit",e=>{
+      e.preventDefault();
+      if (!$("adhesion-form").reportValidity()) return;
+      guarded(async()=>{
+        const user = auth.currentUser;
+        await reload(user);
+        await user.getIdToken(true);
+        if (!user.emailVerified) {show("verification"); throw new Error("email-not-verified");}
+        const nome=$("nome").value.trim(), cognome=$("cognome").value.trim(), comune=$("comune").value.trim();
+        if (nome.length<2 || cognome.length<2 || comune.length<2) {status("Completa tutti i campi.",true);return;}
+        await setDoc(doc(db,"adesioni",user.uid),{
+          nome,cognome,comune,email:user.email,
+          consensoEsplicito:true,
+          privacyVersion:"2026-11-17-v1",
+          creataIl:serverTimestamp()
+        });
+        $("adhesion-form").reset();
+        await refreshPanel();
+        status("Adesione civica registrata. Grazie per il tuo sostegno!");
+      });
+    });
+    $("delete-adhesion").addEventListener("click",()=>guarded(async()=>{
+      if (!confirm("Vuoi ritirare l'adesione? Il relativo documento verrà eliminato.")) return;
+      await deleteDoc(doc(db,"adesioni",auth.currentUser.uid));
+      await refreshPanel();
+      status("Adesione revocata e rimossa dall'archivio. L'account rimane attivo.");
+    }));
+    $("delete-account").addEventListener("click",()=>guarded(async()=>{
+      if (!confirm("Eliminare l'account e la tua adesione? L'operazione non è reversibile.")) return;
+      const user=auth.currentUser;
+      await deleteDoc(doc(db,"adesioni",user.uid));
+      await deleteUser(user);
+      show("account");
+      status("Adesione e account eliminati.");
+    }));
+  }
+</script>
+</body>
+</html>
