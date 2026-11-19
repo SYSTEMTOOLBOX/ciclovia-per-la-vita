@@ -1,0 +1,46 @@
+name: Aggiorna totale anonimo delle adesioni
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: counter-adesioni
+  cancel-in-progress: false
+
+jobs:
+  count:
+    if: github.repository == 'SYSTEMTOOLBOX/ciclovia-per-la-vita'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Calcola totale senza esportare dati personali
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "Credenziale non ancora configurata: nessun conteggio pubblicato."
+            exit 0
+          fi
+          npm install --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13
+          node scripts/update-adesioni-count.cjs
+      - name: Pubblica soltanto il totale
+        run: |
+          if git diff --quiet -- adesioni-count.json; then
+            echo "Nessun aggiornamento da pubblicare."
+            exit 0
+          fi
+          git config user.name "ciclovia-count-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- adesioni-count.json
+          git commit -m "Aggiorna conteggio pubblico aggregato"
+          git push origin HEAD:main
