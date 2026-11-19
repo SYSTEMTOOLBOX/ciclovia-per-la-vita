@@ -175,6 +175,7 @@
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js")
     ]);
     const auth = getAuth(initializeApp(firebaseConfig));
+    auth.languageCode = "it"; // Email di verifica e recupero password in italiano
     const db = getFirestore();
     let busy = false;
     async function guarded(fn) {
