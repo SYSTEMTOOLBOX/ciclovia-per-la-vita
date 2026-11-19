@@ -10,7 +10,7 @@
     dates.forEach(el => el.textContent = "Raccolta non ancora aperta");
   }
   try {
-    const res = await fetch("./adesioni-count.json", {cache: "no-store"});
+    const res = await fetch("https://raw.githubusercontent.com/SYSTEMTOOLBOX/ciclovia-per-la-vita/main/adesioni-count.json", {cache: "no-store"});
     if (!res.ok) throw new Error("Conteggio non raggiungibile");
     const data = await res.json();
     if (data.status !== "verified" || !Number.isSafeInteger(data.count) || data.count < 0 ||
