@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#112b24">
+  <meta name="description" content="Collaudo tecnico della verifica email per Una ciclovia per la vita. Non registra adesioni.">
+  <title>Prova registrazione email | Una ciclovia per la vita</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f7ef;color:#19372b}
+    header{background:#112b24;color:#e4faac;padding:22px max(22px,calc((100% - 740px)/2));font-weight:800}
+    header a{color:inherit;text-decoration:none}
+    main{max-width:740px;margin:30px auto 75px;padding:0 18px}
+    .eyebrow{color:#426b43;font-size:.79rem;letter-spacing:.12em;font-weight:900;text-transform:uppercase}
+    h1{font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.045em;line-height:1.07;margin:13px 0 20px}
+    h2{font-size:1.28rem;margin:0 0 12px}
+    p{margin:9px 0 17px}
+    .card{background:#fff;border:1px solid #dce4d3;border-radius:17px;padding:clamp(19px,4vw,32px);margin:17px 0;box-shadow:0 9px 33px #142e1e09}
+    .notice{border-left:5px solid #c28d3a;background:#fff4db;padding:17px;border-radius:8px}
+    label{display:block;font-weight:750;margin:17px 0 6px}
+    input{display:block;width:100%;font:inherit;padding:12px 14px;min-height:48px;border:1px solid #adbdac;border-radius:9px;color:#19372b;background:white}
+    input:focus,button:focus-visible,a:focus-visible{outline:3px solid #b1db60;outline-offset:3px}
+    label.check{display:flex;align-items:flex-start;gap:11px;font-weight:500;font-size:.92rem}
+    label.check input{width:20px;min-height:20px;height:20px;flex:0 0 20px;margin:3px 0 0;accent-color:#315c35}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    button{background:#143f2b;color:#fff;border:0;border-radius:999px;font:inherit;font-weight:800;padding:12px 20px;min-height:47px;cursor:pointer}
+    button.secondary{background:#e7f2d9;color:#1c492e}
+    button.danger{background:#fce8e5;color:#983c31}
+    button:disabled{opacity:.55;cursor:wait}
+    [hidden]{display:none!important}
+    .muted{color:#5a7062;font-size:.9rem}
+    .feedback{padding:16px 18px;border:1px solid #b7d8a4;border-radius:10px;background:#eaf6dd;font-weight:650}
+    .feedback.error{background:#fff0e8;color:#943f2c;border-color:#edc1b4}
+    a{color:#216840}
+    footer{max-width:740px;margin:auto;padding:20px 18px 45px;border-top:1px solid #d6e1d1;font-size:.85rem;color:#576f5c}
+  </style>
+</head>
+<body>
+<header><a href="./">← UNA CICLOVIA PER LA VITA · CHIVASSO–ASTI</a></header>
+<main>
+  <div class="eyebrow">Collaudo tecnico per amici invitati</div>
+  <h1>Proviamo la verifica email.</h1>
+  <p class="notice"><strong>Questa NON è una raccolta firme.</strong> La pagina serve soltanto a provare registrazione, email di verifica e cancellazione dell'account. <strong>Non vengono richiesti nome, cognome o Comune, né viene salvata alcuna adesione nel database.</strong> Il collegamento è pubblico per chi lo conosce: non inserire dati che non vuoi usare per questa prova.</p>
+  <p>La prova è gratuita. Per partecipare occorre avere almeno 18 anni e un indirizzo email al quale si ha accesso. Firebase gestisce email, password e identificativo tecnico dell'account. <a href="privacy.html" target="_blank" rel="noopener noreferrer">Leggi l'informativa privacy</a>.</p>
+  <p id="feedback" class="feedback" role="status" aria-live="polite" hidden></p>
+  <section id="registration" class="card" aria-labelledby="reg-title" hidden>
+    <h2 id="reg-title">1. Registrati o accedi</h2>
+    <p class="muted">Se hai già creato l'account, usa Accedi. Non usare una password che utilizzi su altri siti.</p>
+    <form id="account-form">
+      <label for="email">La tua email</label>
+      <input id="email" type="email" required autocomplete="email" maxlength="254">
+      <label for="password">Password per questa prova (minimo 6 caratteri)</label>
+      <input id="password" type="password" required autocomplete="new-password" minlength="6" maxlength="128">
+      <label class="check"><input id="adult" type="checkbox"><span>Dichiaro di essere maggiorenne e di aver compreso che creo un account Firebase solo per questa prova tecnica, non una firma né un'adesione.</span></label>
+      <div class="buttons">
+        <button id="register" type="button">Crea account di prova</button>
+        <button id="signin" class="secondary" type="submit">Accedi</button>
+      </div>
+    </form>
+  </section>
+  <section id="logged" class="card" aria-labelledby="logged-title" hidden>
+    <h2 id="logged-title">2. Controlla la tua email</h2>
+    <p class="muted">Account: <strong id="account-address"></strong></p>
+    <p id="verification-note">Apri la casella email e cerca il messaggio inviato da Firebase, anche nello spam. Tocca il link che ricevi, torna qui e premi «Ho verificato l'email».</p>
+    <div class="buttons">
+      <button id="check-email" type="button">Ho verificato l'email</button>
+      <button id="resend" class="secondary" type="button">Rimanda l'email</button>
+      <button id="logout" class="secondary" type="button">Esci</button>
+    </div>
+    <hr style="border:0;border-top:1px solid #d9e4d0;margin:28px 0">
+    <h2>3. Elimina l'account di prova</h2>
+    <p class="muted">Al termine della prova elimina l'account. La password viene usata soltanto per riautenticarti prima dell'eliminazione.</p>
+    <form id="delete-form">
+      <label for="delete-password">Inserisci nuovamente la password</label>
+      <input id="delete-password" type="password" autocomplete="current-password" required minlength="6" maxlength="128">
+      <div class="buttons"><button type="submit" class="danger">Elimina il mio account di prova</button></div>
+    </form>
+  </section>
+  <section class="card" aria-label="Informazioni sul test">
+    <h2>Cosa stiamo verificando?</h2>
+    <p>La consegna dell'email, la conferma dell'indirizzo e la possibilità di cancellare l'account. <strong>Non stiamo testando o aprendo la registrazione delle adesioni civiche:</strong> quella funzione resta chiusa.</p>
+    <p class="muted">Se non riesci a cancellare l'account, scrivi a <a href="mailto:kaironlabsstudio@gmail.com">kaironlabsstudio@gmail.com</a> per richiederne la cancellazione. Non inviare mai la tua password.</p>
+  </section>
+</main>
+<footer>Progetto civico indipendente · Promotore Loris Nordio · <a href="./">Torna al sito</a> · <a href="privacy.html">Informativa privacy</a></footer>
+<script type="module">
+  import { firebaseConfig } from "./firebase-config.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendEmailVerification, reload,
+    signOut, reauthenticateWithCredential, EmailAuthProvider, deleteUser
+  } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+
+  const $ = id => document.getElementById(id);
+  const status = (message, error=false) => {
+    const node=$("feedback");
+    node.hidden=!message;
+    node.textContent=message || "";
+    node.classList.toggle("error",error);
+    if (message) node.scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+  const explain = e => {
+    const errors={
+      "auth/email-already-in-use":"Questo indirizzo è già registrato. Usa Accedi.",
+      "auth/invalid-email":"Controlla l'indirizzo email.",
+      "auth/weak-password":"La password è troppo debole: usane una più lunga.",
+      "auth/invalid-credential":"Email o password non corretti.",
+      "auth/too-many-requests":"Troppi tentativi: riprova più tardi.",
+      "auth/requires-recent-login":"Devi accedere di nuovo prima di eliminare l'account.",
+      "auth/network-request-failed":"Problema di connessione. Riprova quando hai rete."
+    };
+    return errors[e?.code] || "Operazione non riuscita. Controlla la rete o contatta il promotore.";
+  };
+  const ready=["apiKey","authDomain","projectId","appId"].every(k=>Boolean(firebaseConfig[k]));
+  if(!ready) {
+    status("La configurazione Firebase non è ancora disponibile. Contatta il promotore.",true);
+  } else {
+    const app=initializeApp(firebaseConfig);
+    const auth=getAuth(app);
+    auth.languageCode="it";
+    let busy=false;
+    const run=async work=>{
+      if(busy)return;
+      busy=true;
+      document.querySelectorAll("button").forEach(b=>b.disabled=true);
+      status("");
+      try{await work();}
+      catch(e){console.warn("Errore tecnico nel collaudo:",e?.code||"unknown");status(explain(e),true);}
+      finally{busy=false;document.querySelectorAll("button").forEach(b=>b.disabled=false);}
+    };
+    const showUser=async()=>{
+      const user=auth.currentUser;
+      $("registration").hidden=Boolean(user);
+      $("logged").hidden=!user;
+      if(!user)return;
+      $("account-address").textContent=user.email || "";
+      await reload(user);
+      await user.getIdToken(true);
+      const verified=Boolean(user.emailVerified);
+      $("verification-note").textContent=verified
+        ? "EMAIL CONFERMATA! Il test è riuscito. Puoi cancellare il tuo account con il modulo qui sotto."
+        : "Controlla la tua casella email (anche lo spam), apri il link ricevuto, poi torna qui e premi «Ho verificato l'email».";
+      $("check-email").hidden=verified;
+      $("resend").hidden=verified;
+    };
+    onAuthStateChanged(auth,()=>run(showUser),e=>status(explain(e),true));
+    $("register").addEventListener("click",()=>run(async()=>{
+      const email=$("email").value.trim(), password=$("password").value;
+      if(!$("adult").checked) {status("Conferma di essere maggiorenne e di aver compreso la prova.",true);return;}
+      if(!$("account-form").reportValidity())return;
+      const {user}=await createUserWithEmailAndPassword(auth,email,password);
+      $("password").value="";
+      try{
+        await sendEmailVerification(user);
+        await showUser();
+        status("Account creato ed email di verifica inviata. Controlla anche lo spam.");
+      }catch(e){
+        await showUser();
+        status("Account creato, ma non è stato possibile inviare l'email. Usa il pulsante «Rimanda l'email» oppure contatta il promotore.",true);
+      }
+    }));
+    $("account-form").addEventListener("submit",e=>{
+      e.preventDefault();
+      run(async()=>{
+        if(!$("account-form").reportValidity())return;
+        await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
+        $("password").value="";
+        await showUser();
+      });
+    });
+    $("check-email").addEventListener("click",()=>run(async()=>{
+      await showUser();
+      status(auth.currentUser?.emailVerified
+        ? "Verifica email riuscita! Ora elimina l'account di prova."
+        : "L'email non risulta ancora verificata. Apri il link ricevuto e riprova.",!auth.currentUser?.emailVerified);
+    }));
+    $("resend").addEventListener("click",()=>run(async()=>{
+      if(!auth.currentUser)return;
+      await sendEmailVerification(auth.currentUser);
+      status("Email di verifica inviata di nuovo. Controlla anche lo spam.");
+    }));
+    $("logout").addEventListener("click",()=>run(async()=>{
+      await signOut(auth);
+      await showUser();
+      status("Sei uscito. Puoi accedere nuovamente per proseguire o cancellare l'account.");
+    }));
+    $("delete-form").addEventListener("submit",e=>{
+      e.preventDefault();
+      if(!$("delete-form").reportValidity())return;
+      run(async()=>{
+        const user=auth.currentUser;
+        if(!user?.email){status("Accedi al tuo account prima di cancellarlo.",true);return;}
+        const pass=$("delete-password").value;
+        $("delete-password").value="";
+        await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,pass));
+        await deleteUser(user);
+        await showUser();
+        status("Account di prova eliminato. Nessuna adesione è stata registrata.");
+      });
+    });
+  }
+</script>
+</body>
+</html>
