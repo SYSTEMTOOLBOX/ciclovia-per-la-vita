@@ -68,6 +68,7 @@
       <input id="account-email" type="email" autocomplete="email" required maxlength="254">
       <label for="account-password">Password</label>
       <input id="account-password" type="password" autocomplete="current-password" required minlength="6" maxlength="128">
+      <label class="tick"><input id="registration-adult" type="checkbox"><span>Per registrarmi dichiaro di avere almeno 18 anni. Non serve selezionare questa casella per accedere a un account già esistente.</span></label>
       <div class="actions">
         <button class="btn" id="create-account" type="button">Registrati</button>
         <button class="btn secondary" id="sign-in" type="submit">Accedi</button>
@@ -116,6 +117,19 @@
     </div>
   </section>
 
+  <section class="card" id="delete-account-panel" hidden aria-labelledby="delete-account-title">
+    <h2 id="delete-account-title">Conferma cancellazione account</h2>
+    <p>Per proteggere il tuo account, reinserisci la password. Verranno rimossi l'adesione dal database attivo e l'account di accesso. L'operazione non è reversibile.</p>
+    <form id="delete-account-form">
+      <label for="delete-account-password">Password attuale</label>
+      <input id="delete-account-password" type="password" autocomplete="current-password" required minlength="6" maxlength="128">
+      <div class="actions">
+        <button class="btn danger" type="submit">Confermo la cancellazione</button>
+        <button class="btn secondary" id="cancel-delete-account" type="button">Annulla</button>
+      </div>
+    </form>
+  </section>
+
   <p class="muted">Progetto civico indipendente, non gestito dalla Regione Piemonte. <a href="privacy.html">Informativa sul trattamento dei dati</a>.</p>
 </main>
 <footer><div class="wrap" style="margin:0 auto">© 2026 Una ciclovia per la vita · Chivasso–Asti · Promotore Loris Nordio, privato cittadino · <a href="./">Torna al sito</a></div></footer>
@@ -124,7 +138,7 @@
   import { firebaseConfig, launchEnabled } from "./firebase-config.js";
   const configured = launchEnabled === true && ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
   const $ = id => document.getElementById(id);
-  const panels = ["setup","account","verification","new-adhesion","existing-adhesion"];
+  const panels = ["setup","account","verification","new-adhesion","existing-adhesion","delete-account-panel"];
   const show = id => panels.forEach(name => $(name).hidden = name !== id);
   const status = (message, error = false) => {
     const box = $("feedback");
@@ -141,7 +155,9 @@
       "auth/weak-password": "Scegli una password più lunga.",
       "auth/invalid-credential": "Email o password non riconosciute.",
       "auth/too-many-requests": "Troppi tentativi: riprova più tardi.",
-      "auth/requires-recent-login": "Per eliminare l'account effettua di nuovo l'accesso.",
+      "auth/requires-recent-login": "La sessione non è più recente: ripeti la conferma con la password.",
+      "auth/wrong-password": "Password non corretta.",
+      "auth/invalid-password": "Password non corretta.",
       "permission-denied": "Salvataggio non autorizzato: verifica la configurazione e le regole."
     };
     return errors[code] || "Operazione non riuscita. Riprova o contatta il promotore se il problema continua.";
@@ -151,7 +167,7 @@
   } else {
     const [
       { initializeApp },
-      { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, reload, signOut, sendPasswordResetEmail, deleteUser },
+      { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, reload, signOut, sendPasswordResetEmail, deleteUser, EmailAuthProvider, reauthenticateWithCredential },
       { getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp }
     ] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js"),
@@ -193,6 +209,10 @@
     $("create-account").addEventListener("click",()=>guarded(async()=>{
       const email = $("account-email").value.trim();
       const password = $("account-password").value;
+      if (!$("registration-adult").checked) {
+        status("Per registrarti devi dichiarare di avere almeno 18 anni.", true);
+        return;
+      }
       if (!$("account-email").checkValidity() || !$("account-password").checkValidity()) {
         $("account-form").reportValidity(); return;
       }
@@ -255,14 +275,34 @@
       await refreshPanel();
       status("Adesione revocata e rimossa dall'archivio. L'account rimane attivo.");
     }));
-    document.querySelectorAll(".delete-account").forEach(button => button.addEventListener("click",()=>guarded(async()=>{
-      if (!confirm("Eliminare l'account e la tua adesione? L'operazione non è reversibile.")) return;
-      const user=auth.currentUser;
-      await deleteDoc(doc(db,"adesioni",user.uid));
-      await deleteUser(user);
-      show("account");
-      status("Adesione e account eliminati.");
-    })));
+    document.querySelectorAll(".delete-account").forEach(button => button.addEventListener("click",()=>{
+      if (!auth.currentUser) { show("account"); return; }
+      $("delete-account-form").reset();
+      show("delete-account-panel");
+      status("");
+    }));
+    $("cancel-delete-account").addEventListener("click",()=>guarded(refreshPanel));
+    $("delete-account-form").addEventListener("submit",e=>{
+      e.preventDefault();
+      if (!$("delete-account-form").reportValidity()) return;
+      guarded(async()=>{
+        const user=auth.currentUser;
+        if (!user || !user.email) { show("account"); return; }
+        const password=$("delete-account-password").value;
+        $("delete-account-password").value="";
+        // Riautentica prima di cancellare i dati dell'adesione.
+        await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,password));
+        await deleteDoc(doc(db,"adesioni",user.uid));
+        try {
+          await deleteUser(user);
+          show("account");
+          status("Adesione e account eliminati.");
+        } catch(err) {
+          show("delete-account-panel");
+          status("L'adesione è stata revocata, ma l'account non è stato cancellato. Accedi di nuovo e ripeti la cancellazione dell'account, oppure contatta il titolare.",true);
+        }
+      });
+    });
   }
 </script>
 </body>
