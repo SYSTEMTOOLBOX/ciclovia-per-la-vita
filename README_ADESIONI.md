@@ -49,3 +49,32 @@ servizi GitHub e Firebase, non dal computer domestico.
 ## Conclusione
 Il codice può essere pubblicato ora, ma **non attribuire adesioni reali al
 sistema né promuovere il modulo come attivo** prima dei nove passaggi.
+
+## Privacy — revisione 19 novembre 2026
+L'informativa in privacy.html identifica il titolare (Loris Nordio) e il
+contatto kaironlabsstudio@gmail.com; distingue account e adesione esplicita,
+documenta destinatari, conservazione, cancellazione, reclami e trasferimenti.
+La versione registrata dall'app e dalle regole Firestore è 2026-11-19-v2.
+Il link alla privacy compare anche PRIMA della creazione dell'account.
+
+### Verifiche obbligatorie prima di attivare il servizio
+- [ ] Verificare effettiva configurazione di Firebase separato, DPA/termini,
+      regione Firestore, trasferimenti internazionali, subfornitori e sicurezza.
+- [ ] Stabilire e documentare la data di chiusura della campagna; predisporre
+      cancellazione delle adesioni entro 12 mesi dalla chiusura.
+- [ ] Predisporre una procedura amministrativa, manuale o automatizzata,
+      per cancellare gli account non verificati e inattivi entro 90 giorni.
+- [ ] Testare end-to-end: registrazione, email di verifica, consenso,
+      versione privacy, blocco accesso a dati altrui, revoca e account delete.
+- [ ] Testare il caso di sessione scaduta (Firebase può richiedere nuovo login
+      prima di cancellare account).
+- [ ] Predisporre processo per email privacy: verifica del richiedente,
+      risposte nei termini previsti e cancellazione dei dati collegati.
+- [ ] Verificare nessun cookie/servizio inatteso e valutare se il sostegno
+      può rivelare opinioni politiche; far revisionare il testo se necessario.
+- [ ] Valutare necessità della creazione obbligatoria dell'account e basi
+      giuridiche rispetto al servizio effettivo, minimizzazione dei dati.
+- [ ] Mantenere launchEnabled=false fino al superamento di tutti i controlli.
+
+Il testo aggiornato NON significa che il database sia pronto o operativo.
+Non pubblicizzare il sito come raccolta firme attiva prima dei test.
