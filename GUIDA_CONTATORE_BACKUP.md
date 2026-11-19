@@ -33,6 +33,7 @@ GitHub Pages può non ricompilare il sito per un commit del GITHUB_TOKEN; il bro
 - Le variabili di ambiente sono `FIREBASE_SERVICE_ACCOUNT_FILE`, `CICLOVIA_BACKUP_DIR` e `CICLOVIA_BACKUP_PASSPHRASE`.
 - Legge la collezione delle adesioni e crea in una cartella **fuori dal repository** un file `.enc` cifrato AES-256-GCM, con chiave derivata dalla passphrase e sale casuale.
 - Il programma rilegge il file e verifica decrittazione e numero di documenti, ma **non è ancora un test completo di ripristino**.
+- Questa prima copia conserva i **documenti delle adesioni**, non un esportazione completa degli account di Firebase Authentication: serve una procedura separata per ricostruire l'accesso degli utenti dopo un guasto grave.
 - Creare **almeno due copie cifrate in due luoghi separati**, ad esempio disco esterno e archivio cloud privato. Non mettere mai l'archivio in un repository GitHub pubblico, neppure cifrato.
 - Impostare un piano periodico di backup, provare davvero il recupero e verificare eventuali richieste di cancellazione e limiti GDPR anche nelle copie di sicurezza.
 - Se si perdono sia la chiave di accesso al progetto sia la passphrase del backup, non è possibile garantire un ripristino dei dati.
