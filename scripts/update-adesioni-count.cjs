@@ -6,6 +6,12 @@ const fs = require('node:fs');
 const admin = require('firebase-admin');
 
 async function main() {
+  // Non pubblicare nemmeno il valore 0 finché la raccolta è chiusa.
+  const config = fs.readFileSync('firebase-config.js', 'utf8');
+  if (!/export\s+const\s+launchEnabled\s*=\s*true\s*;/.test(config)) {
+    console.log('Raccolta ancora disattivata: nessun totale pubblicato.');
+    return;
+  }
   const secret = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (!secret) {
     console.log('Configurazione non ancora disponibile: nessun conteggio pubblicato.');
