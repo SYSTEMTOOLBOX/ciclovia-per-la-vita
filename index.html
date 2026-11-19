@@ -325,6 +325,20 @@
       </div>
     </div>
 
+    <section class="block" id="sostegno" style="padding:45px 0 60px" aria-labelledby="sostegno-title">
+      <div class="container" style="max-width:820px">
+        <div class="eyebrow section-label">Trasparenza e partecipazione</div>
+        <h2 id="sostegno-title" style="font-size:clamp(2rem,4vw,3.5rem)">Quante persone sostengono la ciclovia?</h2>
+        <p class="section-intro">Mostreremo il numero delle adesioni civiche confermate, mai i nomi o le email dei partecipanti.</p>
+        <div style="background:#fffef9;border:1px solid #dae5d3;border-radius:24px;padding:28px 30px">
+          <div class="eyebrow" style="font-size:.72rem">Adesioni civiche confermate</div>
+          <div data-adesioni-count aria-live="polite" style="font-size:clamp(2rem,5vw,3.6rem);font-weight:900;color:#193b2b;letter-spacing:-.05em;margin:10px 0">In preparazione</div>
+          <div data-adesioni-updated style="color:#65736b;font-size:.86rem">Raccolta non ancora aperta</div>
+          <p style="font-size:.82rem;color:#65736b;margin-top:16px;margin-bottom:0">Il conteggio includerà solo le adesioni effettivamente presenti nell'archivio riservato. Le registrazioni di prova non si contano. Le adesioni digitali non equivalgono a firme autenticate.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="block" id="perche">
       <div class="container">
         <div class="intro-grid">
@@ -541,5 +555,6 @@
     })();
   </script>
 
+  <script src="counter-adesioni.js" defer></script>
 </body>
 </html>
