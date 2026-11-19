@@ -52,6 +52,12 @@
   <h1>La tua adesione<br>per la ciclovia.</h1>
   <p class="lead">Sostieni la richiesta di valutare una ciclovia lungo il tracciato Chivasso–Asti. Nessuna firma viene pubblicata. La partecipazione è volontaria.</p>
   <p class="note warning"><strong>Attenzione:</strong> queste sono adesioni digitali di sostegno civico, non firme autenticate per una petizione ufficiale alla Regione Piemonte.</p>
+  <section class="card" aria-label="Conteggio adesioni" style="background:#edf5e5">
+    <strong style="display:block;font-size:.9rem">Adesioni civiche confermate</strong>
+    <div data-adesioni-count style="font-size:clamp(2rem,7vw,3rem);font-weight:900;letter-spacing:-.05em">In preparazione</div>
+    <span class="muted" data-adesioni-updated>Raccolta non ancora aperta</span>
+    <p class="muted">Questo totale è aggregato e non mostra nomi o email. Gli account di prova non vengono conteggiati. Le adesioni non sono firme autenticate.</p>
+  </section>
   <p id="feedback" role="status" aria-live="polite" hidden></p>
 
   <section class="card" id="setup" hidden aria-labelledby="setup-title">
@@ -199,7 +205,8 @@
       }
       const snapshot = await getDoc(doc(db, "adesioni", user.uid));
       if (snapshot.exists()) {
-        $("existing-details").textContent = "Email verificata: " + (user.email || "") + ". Puoi ritirare il consenso e cancellare l'adesione.";
+        const name = snapshot.data()?.nome || "";
+        $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + "Email verificata: " + (user.email || "") + ". Il tuo nome compare soltanto nel tuo profilo privato. Puoi ritirare il consenso e cancellare l'adesione.";
         show("existing-adhesion");
       } else {
         $("verified-address").textContent = "Email verificata: " + (user.email || "");
@@ -306,5 +313,6 @@
     });
   }
 </script>
+  <script src="counter-adesioni.js" defer></script>
 </body>
 </html>
