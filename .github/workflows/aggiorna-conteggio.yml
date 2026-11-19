@@ -23,16 +23,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Calcola totale senza esportare dati personali
+      - name: Verifica se e disponibile il conteggio
+        id: ready
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         run: |
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
-            echo "Credenziale non ancora configurata: nessun conteggio pubblicato."
-            exit 0
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT_JSON" ] && grep -q "export const launchEnabled = true;" firebase-config.js; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Raccolta chiusa oppure credenziale non configurata."
           fi
-          npm install --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13
-          node scripts/update-adesioni-count.cjs
+      - name: Installa SDK senza accesso alle credenziali
+        if: steps.ready.outputs.enabled == 'true'
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13
+      - name: Calcola totale senza esportare dati personali
+        if: steps.ready.outputs.enabled == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/update-adesioni-count.cjs
       - name: Pubblica soltanto il totale
         run: |
           if git diff --quiet -- adesioni-count.json; then
