@@ -74,7 +74,7 @@
         <button class="btn secondary" id="reset-password" type="button">Password dimenticata</button>
       </div>
     </form>
-    <p class="muted">La creazione dell'account serve per la verifica email; non registra automaticamente l'adesione.</p>
+    <p class="muted">La creazione dell'account serve per verificare l'email e non registra automaticamente l'adesione. Prima di registrarti, leggi l'<a href="privacy.html" target="_blank" rel="noopener noreferrer">informativa privacy</a>: email e dati tecnici sono necessari per creare e proteggere l'account.</p>
   </section>
 
   <section class="card" id="verification" hidden aria-labelledby="verification-title">
@@ -241,7 +241,7 @@
           nome,cognome,comune,email:user.email,
           consensoEsplicito:true,
           maggiorenne:true,
-          privacyVersion:"2026-11-17-v1",
+          privacyVersion:"2026-11-19-v2",
           creataIl:serverTimestamp()
         });
         $("adhesion-form").reset();
