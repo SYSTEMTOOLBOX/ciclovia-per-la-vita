@@ -2,6 +2,11 @@ name: Aggiorna totale anonimo delle adesioni
 
 on:
   workflow_dispatch:
+    inputs:
+      test_connection:
+        description: "Verifica Firebase senza aprire la raccolta e senza pubblicare il totale"
+        type: boolean
+        default: true
   schedule:
     - cron: "23 * * * *"
 
@@ -27,8 +32,9 @@ jobs:
         id: ready
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          CONNECTION_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test_connection == true && '1' || '0' }}
         run: |
-          if [ -n "$FIREBASE_SERVICE_ACCOUNT_JSON" ] && grep -q "export const launchEnabled = true;" firebase-config.js; then
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT_JSON" ] && { grep -q "export const launchEnabled = true;" firebase-config.js || [ "$CONNECTION_TEST" = "1" ]; }; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
@@ -41,6 +47,7 @@ jobs:
         if: steps.ready.outputs.enabled == 'true'
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          CICLOVIA_CONNECTION_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test_connection == true && '1' || '0' }}
         run: node scripts/update-adesioni-count.cjs
       - name: Pubblica soltanto il totale
         run: |
