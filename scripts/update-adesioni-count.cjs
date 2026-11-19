@@ -8,7 +8,9 @@ const admin = require('firebase-admin');
 async function main() {
   // Non pubblicare nemmeno il valore 0 finché la raccolta è chiusa.
   const config = fs.readFileSync('firebase-config.js', 'utf8');
-  if (!/export\s+const\s+launchEnabled\s*=\s*true\s*;/.test(config)) {
+  const publicActive = /export\s+const\s+launchEnabled\s*=\s*true\s*;/.test(config);
+  const connectionTest = process.env.CICLOVIA_CONNECTION_TEST === '1';
+  if (!publicActive && !connectionTest) {
     console.log('Raccolta ancora disattivata: nessun totale pubblicato.');
     return;
   }
@@ -31,6 +33,10 @@ async function main() {
     const result = await admin.firestore(app).collection('adesioni').count().get();
     const total = result.data().count;
     if (!Number.isSafeInteger(total) || total < 0) throw new Error('Conteggio Firestore non valido.');
+    if (!publicActive) {
+      console.log('Test del collegamento Firebase riuscito. Raccolta chiusa: nessun conteggio pubblicato.');
+      return;
+    }
     fs.writeFileSync('adesioni-count.json', JSON.stringify({
       status: 'verified',
       count: total,
