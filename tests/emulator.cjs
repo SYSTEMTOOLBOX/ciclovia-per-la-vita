@@ -24,7 +24,7 @@ test('raccolta chiusa sul server anche aggirando il flag JavaScript',async()=>{
   await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'config/raccolta'),{enabled:false}));
   await assertFails(setDoc(doc(own,'adesioni/closed'),fields('closed')));
 });
-test('l'interruttore di vecchio collaudo non può più consentire adesioni',async()=>{
+test("l'interruttore di vecchio collaudo non può più consentire adesioni",async()=>{
   const allowed = db('allowed');
   await env.withSecurityRulesDisabled(async c =>
     setDoc(doc(c.firestore(),'config/collaudo'),{
