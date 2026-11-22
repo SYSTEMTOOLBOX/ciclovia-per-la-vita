@@ -36,6 +36,9 @@ if (!adh.includes('privacyVersion:"' + version + '"')) fail('Versione privacy no
 if (!rules.includes("d.privacyVersion == '" + version + "'")) fail('Versione privacy non coerente con firestore.rules');
 if (!adh.includes('id="consenso" type="checkbox" required')) fail('Manca la casella di consenso esplicito');
 if (!adh.includes('launchEnabled === true')) fail('Manca la protezione di apertura del modulo');
+if (adh.includes('trialMode') || adh.includes('collaudo-warning')) fail('Modalita di collaudo ancora attiva nel modulo pubblico');
+if (rules.includes('collectionTestAllowed') || rules.includes('testEmails')) fail('Permessi di collaudo ancora attivi sul backend');
+if (!home.includes('stato-raccolta-home') || !policy.includes('privacy-stato-titolo')) fail('Le etichette di apertura pubblica non si aggiornano');
 if (!adh.includes('getDocFromServer(target)') || !adh.includes('const confirmed = await getDocFromServer(target)')) {
   fail('Manca il controllo sul server prima della conferma adesione');
 }
