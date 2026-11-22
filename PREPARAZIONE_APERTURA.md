@@ -3,6 +3,9 @@
 **NON autorizza l'apertura pubblica.** Questa e' la checklist tecnica unica per riprendere senza Codex. Il repository GitHub non applica le regole al progetto Firebase: si tratta di due ambienti separati.
 
 ## PASS — riscontri effettivi
+- **22/11/2026, test REALE:** un account Gmail verificato ha registrato correttamente un documento in `adesioni`, confermato dalla pagina con rilettura server e dalla console Firestore (consenso, timestamp, privacyVersion presenti). La revoca dal profilo ha dato messaggio di successo e la collezione `adesioni` e' scomparsa dalla vista Firestore dopo aggiornamento.
+- **22/11/2026, test negativo REALE:** riportando `config/collaudo.enabled=false`, lo stesso account ha ricevuto il messaggio `Salvataggio non autorizzato` e non e' stata confermata una nuova adesione. L'account Authentication e' rimasto attivo.
+- **22/11/2026, pulizia PR #6:** il codice pubblico non utilizza piu' `?collaudo=1` e le regole nel repository non permettono piu' l'eccezione `config/collaudo`. CI sul ramo e su main PASS, GitHub Pages distribuito. **IMPORTANTE: le regole ripulite sono SOLO nel repository: DEVONO ANCORA essere copiate/pubblicate su Firebase Console.** L'interruttore `config/raccolta.enabled` resta false e `launchEnabled=false`.
 - **22/11/2026: screenshot Firebase Console:** Firestore `(default)` in `europe-west1`; nella scheda Dati, documento amministrativo `config/raccolta` creato con **`enabled: false` (boolean)**. Non costituisce una nuova adesione e non apre il server.
 - **22/11/2026: screenshot Firebase Console:** dopo l'incolla nella scheda Regole non appare piu' il banner modifiche non pubblicate. Questo indica che la pubblicazione sembra completata, ma la regola finale va ancora verificata con test controllati, non desunta soltanto dall'interfaccia.
 - PR #3: sito, adesioni, verifica email, regole, backup cifrato e test su GitHub. Ramo `audit/adesioni-affidabili-20261122`; non ancora unita a `main`.
