@@ -36,6 +36,29 @@ if (!adh.includes('privacyVersion:"' + version + '"')) fail('Versione privacy no
 if (!rules.includes("d.privacyVersion == '" + version + "'")) fail('Versione privacy non coerente con firestore.rules');
 if (!adh.includes('id="consenso" type="checkbox" required')) fail('Manca la casella di consenso esplicito');
 if (!adh.includes('launchEnabled === true')) fail('Manca la protezione di apertura del modulo');
+if (!adh.includes('getDocFromServer(target)') || !adh.includes('const confirmed = await getDocFromServer(target)')) {
+  fail('Manca il controllo sul server prima della conferma adesione');
+}
+if (!adh.includes('if (prior.exists())') || !adh.includes('if (existing.exists())')) {
+  fail('Manca la protezione di recupero adesioni gia salvate');
+}
+if (!adh.includes('Account creato, ma la richiesta di email non è riuscita')) {
+  fail('Manca il recupero in caso di email di verifica non inviata');
+}
+// Controlla la sintassi del modulo JavaScript senza eseguirlo e senza accesso Firebase.
+const os = require('node:os');
+const { spawnSync } = require('node:child_process');
+const script = (adh.match(/<script type="module">([\s\S]*?)<\/script>/) || [])[1];
+if (!script) fail('Modulo JavaScript di adesione mancante');
+const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ciclovia-check-'));
+const tmpFile = path.join(tmpDir, 'adesioni.mjs');
+try {
+  fs.writeFileSync(tmpFile, script, 'utf8');
+  const syntax = spawnSync(process.execPath, ['--check', tmpFile], {encoding:'utf8', timeout:10000});
+  if (syntax.status !== 0) fail('Sintassi JavaScript adesioni non valida: ' + (syntax.stderr || '').slice(0,400));
+} finally {
+  fs.rmSync(tmpDir, {recursive:true,force:true});
+}
 if (!trial.includes('Non vengono richiesti nome, cognome o Comune')) fail('Etichetta di test mancante');
 if (!home.includes('href="adesioni.html"') || !home.includes('href="privacy.html"')) fail('Collegamenti principali mancanti');
 if (!rules.includes('allow list: if false;') || !rules.includes('allow update: if false;')) fail('Permessi Firestore non sufficientemente stretti');
