@@ -4,26 +4,19 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const html=fs.readFileSync(require('node:path').join(__dirname,'../adesioni.html'),'utf8');
 const original=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-async function setup({writeError,readError,lostAck=false,readAfterWriteError=false,existing=false,verified=true,mailError=false,closed=false,trial=false}={}) {
+async function setup({writeError,readError,lostAck=false,readAfterWriteError=false,existing=false,verified=true,mailError=false,closed=false}={}) {
   const elements=new Map();let saved=existing,writes=0,resets=0;
   function el(id){if(!elements.has(id))elements.set(id,{value:'Test',checked:true,hidden:true,textContent:'',classList:{toggle(){}},scrollIntoView(){},checkValidity:()=>true,reportValidity:()=>true,addEventListener(event,fn){this[event]=fn;},reset(){resets++;}});return elements.get(id);}
   const user={uid:'test',email:'synthetic@example.test',emailVerified:verified,getIdToken:async()=>''};
   const sdk=[{initializeApp:()=>({})},{getAuth:()=>({currentUser:user}),onAuthStateChanged(){},reload:async()=>{},createUserWithEmailAndPassword:async()=>({user}),sendEmailVerification:async()=>{if(mailError)throw {code:'auth/too-many-requests'};}},{getFirestore:()=>({}),doc:()=>({}),getDocFromServer:async()=>{if(readError || (saved && readAfterWriteError))throw {code:'unavailable'};return {exists:()=>saved,data:()=>({nome:'Test'})};},runTransaction:async(db,fn)=>{writes++;if(writeError)throw {code:'permission-denied'};await fn({get:async()=>({exists:()=>saved}),set:()=>{saved=true;}});if(lostAck)throw {code:'unavailable'};},serverTimestamp:()=>({})}];
   const script=original.replace(/import \{ firebaseConfig, launchEnabled \} from "\.\/firebase-config.js";/,'').replace(/await Promise\.all\(\[[\s\S]*?\]\)/,'sdk');
-  const context={firebaseConfig:{apiKey:'demo',authDomain:'demo',projectId:'demo',appId:'demo'},launchEnabled:!closed,location:{search:trial?'?collaudo=1':''},URLSearchParams,sdk,document:{getElementById:el,querySelectorAll:()=>[]},console:{warn(){}},confirm:()=>false};
+  const context={firebaseConfig:{apiKey:'demo',authDomain:'demo',projectId:'demo',appId:'demo'},launchEnabled:!closed,sdk,document:{getElementById:el,querySelectorAll:()=>[]},console:{warn(){}},confirm:()=>false};
   await vm.runInNewContext('(async()=>{'+script+'})()',context);
   async function submit(){el('adhesion-form').submit({preventDefault(){}});await new Promise(resolve=>setImmediate(resolve));}
   return {el,submit,state:()=>({saved,writes,resets})};
 }
 test('modulo chiuso non registra gestori di invio',async()=>{
   const h=await setup({closed:true});assert.equal(h.el('setup').hidden,false);assert.equal(h.el('adhesion-form').submit,undefined);
-});
-test('collaudo mostra il modulo con sito pubblico chiuso ma non modifica i permessi server',async()=>{
-  const h=await setup({closed:true,trial:true});
-  assert.equal(h.el('setup').hidden,true);
-  assert.equal(h.el('collaudo-warning').hidden,false);
-  assert.equal(typeof h.el('adhesion-form').submit,'function');
-  // Lo SDK resta soggetto alle regole Firestore testate su emulatori.
 });
 test('conferma solo dopo salvataggio e lettura server; retry senza duplicati',async()=>{
   const h=await setup();await h.submit();assert.match(h.el('feedback').textContent,/Adesione verificata/);assert.equal(h.state().writes,1);

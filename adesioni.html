@@ -59,7 +59,6 @@
     <p class="muted">Questo totale è aggregato e non mostra nomi o email. Gli account di prova non vengono conteggiati. Le adesioni non sono firme autenticate.</p>
   </section>
   <p id="feedback" role="status" aria-live="polite" hidden></p>
-  <p id="collaudo-warning" class="note warning" hidden><strong>Solo collaudo tecnico:</strong> questa pagina e' riservata agli account di prova autorizzati. Le adesioni create in questa modalita' sono registrate davvero in Firestore, ma NON devono essere considerate adesioni pubbliche: revocale alla fine del collaudo. La raccolta pubblica e' ancora chiusa.</p>
 
   <section class="card" id="setup" hidden aria-labelledby="setup-title">
     <h2 id="setup-title">Adesioni online non ancora aperte</h2>
@@ -144,14 +143,10 @@
 
 <script type="module">
   import { firebaseConfig, launchEnabled } from "./firebase-config.js";
-  // La pagina di collaudo mostra il modulo, ma NON concede alcun permesso
-  // nel database: solo le regole Firestore e la lista privata del titolare
-  // possono autorizzare le scritture dei cinque account verificati.
-  const trialMode = typeof location !== "undefined" &&
-    new URLSearchParams(location.search).get("collaudo") === "1";
-  const configured = (launchEnabled === true || trialMode) && ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
+  // Non permettere a un parametro nell'URL di attivare la raccolta:
+  // l'interruttore di pubblicazione viene impostato soltanto dal titolare.
+  const configured = launchEnabled === true && ["apiKey", "authDomain", "projectId", "appId"].every(key => Boolean(firebaseConfig[key]));
   const $ = id => document.getElementById(id);
-  if (trialMode) $("collaudo-warning").hidden = false;
   const panels = ["setup","account","verification","new-adhesion","existing-adhesion","delete-account-panel"];
   const show = id => panels.forEach(name => $(name).hidden = name !== id);
   const status = (message, error = false) => {
@@ -172,7 +167,7 @@
       "auth/requires-recent-login": "La sessione non è più recente: ripeti la conferma con la password.",
       "auth/wrong-password": "Password non corretta.",
       "auth/invalid-password": "Password non corretta.",
-      "permission-denied": "Salvataggio non autorizzato. In collaudo possono aderire soltanto i profili autorizzati e verificati: nessuna adesione e' stata confermata.",
+      "permission-denied": "Salvataggio non autorizzato. Verifica che la raccolta sia aperta e che la tua email sia confermata. Se il problema continua, contatta il promotore.",
       "unavailable": "Il database non è raggiungibile. I dati del modulo non vengono cancellati: riprova quando la connessione torna.",
       "adhesion-not-confirmed": "Il server non ha confermato l’adesione. Accedi di nuovo per controllare se risulti già registrato: non compilare account multipli.",
       "email-not-verified": "Devi prima verificare l’email. Nessuna adesione è stata registrata."

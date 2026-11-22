@@ -24,7 +24,7 @@ footer{font-size:.86rem;color:#627367;padding:15px 0}
 <body>
 <header><a href="./">← Una ciclovia per la vita</a></header>
 <main>
-<p class="notice"><strong>Raccolta online non ancora attiva.</strong> Questa informativa descrive il servizio di adesioni civiche predisposto. La raccolta sarà abilitata soltanto dopo le verifiche contrattuali e tecniche. La semplice visita del sito è libera e non richiede un account.</p>
+<p class="notice"><strong id="privacy-stato-titolo">Raccolta online non ancora attiva.</strong> <span id="privacy-stato-descrizione">Questa informativa descrive il servizio di adesioni civiche predisposto. La raccolta sarà abilitata soltanto dopo le verifiche contrattuali e tecniche.</span> La semplice visita del sito è libera e non richiede un account.</p>
 <h1>Informativa sul trattamento dei dati personali</h1>
 <p>Proposta civica «Una ciclovia per la vita – Chivasso–Asti». Versione <strong>2026-11-19-v2</strong> del 19 novembre 2026, predisposta ai sensi degli articoli 12 e 13 del Regolamento (UE) 2016/679 (GDPR).</p>
 <section><h2>1. Titolare e contatti</h2>
@@ -46,7 +46,7 @@ footer{font-size:.86rem;color:#627367;padding:15px 0}
 <p>Gli altri visitatori non possono consultare nomi, email o elenchi individuali. Il titolare può accedere ai dati attraverso strumenti amministrativi autorizzati. Alla stampa, ai cittadini e alle istituzioni potranno essere comunicati soltanto i risultati aggregati e la proposta, <strong>non i nominativi degli aderenti</strong>. I dati non saranno venduti o usati per altre campagne.</p>
 <p>Fornitori previsti: <strong>GitHub Pages</strong> per le pagine pubbliche; <strong>Google Firebase Authentication</strong> per gli account e <strong>Cloud Firestore</strong> per l'archivio privato delle adesioni. I fornitori possono avvalersi di subfornitori secondo gli accordi applicabili.</p></section>
 <section><h2>6. Trattamenti fuori dallo Spazio economico europeo</h2>
-<p>L'archivio Firestore sarà configurato in una regione UE; questo <strong>non implica</strong> che tutti i dati tecnici relativi ad autenticazione, assistenza o sicurezza rimangano nel SEE. I fornitori possono trattare dati anche in Paesi terzi. Prima dell'avvio occorre verificare gli accordi sul trattamento, i trasferimenti effettivi, le decisioni di adeguatezza o le garanzie applicabili, comprese le eventuali clausole contrattuali tipo.</p>
+<p>L'archivio Firestore è configurato nella regione UE <strong>europe-west1 (Belgio)</strong>; questo <strong>non implica</strong> che tutti i dati tecnici relativi ad autenticazione, assistenza o sicurezza rimangano nel SEE. I fornitori possono trattare dati anche in Paesi terzi. Prima dell'avvio occorre verificare gli accordi sul trattamento, i trasferimenti effettivi, le decisioni di adeguatezza o le garanzie applicabili, comprese le eventuali clausole contrattuali tipo.</p>
 <p>Documenti dei fornitori: <a href="https://firebase.google.com/terms/data-processing-terms" target="_blank" rel="noopener noreferrer">termini sul trattamento dati Firebase</a> e <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">informativa privacy GitHub</a>.</p></section>
 <section><h2>7. Conservazione, revoca e cancellazione</h2>
 <p><strong>Adesioni:</strong> fino alla fine della campagna e comunque non oltre <strong>12 mesi dalla sua chiusura</strong>. <strong>Account con email non verificata:</strong> eliminazione dopo 90 giorni dalla creazione. <strong>Account senza adesione:</strong> eliminazione dopo 90 giorni d'inattività. Eventuali dati ancora necessari per gestire richieste privacy o obblighi di legge potranno essere conservati nei limiti consentiti dalla normativa.</p>
@@ -60,7 +60,17 @@ footer{font-size:.86rem;color:#627367;padding:15px 0}
 <section><h2>10. Modifiche e riferimenti</h2>
 <p>Questa informativa deve essere consultabile prima della creazione dell'account e prima dell'adesione. Il sistema registra la versione della privacy associata all'adesione. Modifiche sostanziali saranno comunicate e, quando richiesto, sarà acquisito un nuovo consenso.</p>
 <p>Riferimenti: <a href="https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32016R0679" target="_blank" rel="noopener noreferrer">Regolamento UE 2016/679</a> · <a href="https://www.garanteprivacy.it/web/guest/home/principi-fondamentali-del-trattamento" target="_blank" rel="noopener noreferrer">Garante privacy</a> · <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase privacy</a>.</p></section>
-<footer>19 novembre 2026 · 2026-11-19-v2 · Informativa predisposta per il servizio non ancora attivo. La raccolta resta bloccata fino al completamento dei controlli descritti.</footer>
+<footer>19 novembre 2026 · 2026-11-19-v2 · <span id="privacy-stato-footer">Informativa predisposta per il servizio non ancora attivo. La raccolta resta bloccata fino al completamento dei controlli descritti.</span></footer>
+<script type="module">
+  import { launchEnabled } from "./firebase-config.js";
+  if (launchEnabled === true) {
+    document.getElementById("privacy-stato-titolo").textContent = "Adesioni civiche online aperte.";
+    document.getElementById("privacy-stato-descrizione").textContent =
+      "Questa informativa descrive il trattamento dei dati per la registrazione e la gestione delle adesioni civiche volontarie.";
+    document.getElementById("privacy-stato-footer").textContent =
+      "Informativa applicabile alle adesioni civiche online.";
+  }
+</script>
 </main>
 </body>
 </html>
