@@ -396,7 +396,7 @@
         <div class="action-copy">
           <div class="eyebrow section-label">La tua voce conta</div><h2>Tu come la useresti?</h2>
           <p>Per portare numeri utili alle istituzioni servirà capire quanti cittadini prenderebbero la bici per andare al lavoro, a scuola o nei paesi vicini. Questo è un esempio del sondaggio che attiveremo.</p>
-          <p><strong>La raccolta delle adesioni online non è ancora attiva.</strong> Qui puoi preparare una testimonianza da copiare e condividere: nulla viene inviato o memorizzato.</p>
+          <p><strong id="stato-raccolta-home">La raccolta delle adesioni online non è ancora attiva.</strong> Qui puoi preparare una testimonianza da copiare e condividere: nulla viene inviato o memorizzato.</p>
           <div class="tiny-callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9h.01"/></svg><div><strong>Adesioni ≠ firme ufficiali.</strong><br>Una risposta online non equivale automaticamente a una firma valida per il deposito della petizione al Consiglio regionale.</div></div>
         </div>
         <form class="survey" id="surveyForm" novalidate>
@@ -420,7 +420,7 @@
           <div class="field"><label for="frequenza">Quanto spesso pensi che la useresti?</label><select id="frequenza" name="frequenza"><option value="ogni giorno">Ogni giorno</option><option value="più volte alla settimana">Più volte alla settimana</option><option value="qualche volta al mese">Qualche volta al mese</option><option value="saltuariamente">Saltuariamente</option></select></div>
           <div class="survey-actions"><button class="btn btn-dark" type="submit">Prepara la mia testimonianza ↗</button><button class="btn btn-outline" id="shareButton" type="button">Condividi l'iniziativa</button></div>
           <div class="generated" id="generated" role="status" aria-live="polite"></div>
-          <p class="privacy-note">Questa pagina non registra firme e non salva le risposte: il modulo prepara soltanto una testimonianza da copiare. La pagina delle adesioni è separata e rimane chiusa fino alla conclusione dei controlli tecnici e privacy. <a href="adesioni.html">Consulta lo stato della raccolta</a> e <a href="privacy.html">leggi l'informativa privacy</a>.</p>
+          <p class="privacy-note">Questa pagina non registra firme e non salva le risposte: il modulo prepara soltanto una testimonianza da copiare. <span id="stato-raccolta-note">La pagina delle adesioni è separata e rimane chiusa fino alla conclusione dei controlli tecnici e privacy.</span> <a href="adesioni.html">Consulta lo stato della raccolta</a> e <a href="privacy.html">leggi l'informativa privacy</a>.</p>
         </form>
       </div>
     </section>
@@ -555,6 +555,15 @@
     })();
   </script>
 
+  <script type="module">
+    import { launchEnabled } from "./firebase-config.js";
+    if (launchEnabled === true) {
+      const home = document.getElementById("stato-raccolta-home");
+      const note = document.getElementById("stato-raccolta-note");
+      if (home) home.textContent = "Le adesioni civiche online sono aperte!";
+      if (note) note.textContent = "La pagina delle adesioni è aperta: puoi registrare il tuo sostegno dopo aver verificato l'email e accettato l'informativa.";
+    }
+  </script>
   <script src="counter-adesioni.js" defer></script>
 </body>
 </html>
