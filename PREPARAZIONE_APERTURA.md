@@ -3,6 +3,8 @@
 **NON autorizza l'apertura pubblica.** Questa e' la checklist tecnica unica per riprendere senza Codex. Il repository GitHub non applica le regole al progetto Firebase: si tratta di due ambienti separati.
 
 ## PASS — riscontri effettivi
+- **22/11/2026: screenshot Firebase Console:** Firestore `(default)` in `europe-west1`; nella scheda Dati, documento amministrativo `config/raccolta` creato con **`enabled: false` (boolean)**. Non costituisce una nuova adesione e non apre il server.
+- **22/11/2026: screenshot Firebase Console:** dopo l'incolla nella scheda Regole non appare piu' il banner modifiche non pubblicate. Questo indica che la pubblicazione sembra completata, ma la regola finale va ancora verificata con test controllati, non desunta soltanto dall'interfaccia.
 - PR #3: sito, adesioni, verifica email, regole, backup cifrato e test su GitHub. Ramo `audit/adesioni-affidabili-20261122`; non ancora unita a `main`.
 - GitHub Actions dopo correzione della revoca: workflow [45050117553](https://github.com/SYSTEMTOOLBOX/ciclovia-per-la-vita/actions/runs/45050117553) verde: test Windows, controlli JS, Firebase Auth e Firestore emulator, ripristino sintetico.
 - Backup **reale** delle adesioni Firestore creato e riletto con verifica riuscita dall'utente su Windows il 22/11: **0 adesioni**. Non include gli account Authentication; non dimostra un ripristino del file reale.
