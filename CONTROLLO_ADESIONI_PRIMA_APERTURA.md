@@ -14,9 +14,10 @@ Le nuove regole aggiungono un interruttore server chiuso per impostazione
 predefinita. Non sono state distribuite in produzione. `launchEnabled` resta falso.
 Procedura eseguibile, limiti e protezioni: [RIPRISTINO_ADESIONI.md](RIPRISTINO_ADESIONI.md).
 
-Restano da verificare con accesso autorizzato: configurazione/regole effettivamente
-pubblicate, audit aggregato dei dati esistenti, consegna Yahoo reale, backup dei
-dati reali con ripristino isolato e primo run del contatore con il secret configurato.
+Restano da verificare con accesso autorizzato: confronto esatto delle regole attualmente
+pubblicate, audit aggregato dei dati esistenti, consegna Yahoo reale, ripristino isolato
+del backup e vera adesione/revoca in produzione. Il primo backup reale CIFRATO (0 documenti)
+e il test della connessione del contatore GitHub con il secret sono riusciti il 22/11/2026.
 Il test Auth emulato non invia posta e non prova la consegna Yahoo.
 Non considerare la raccolta pronta all'apertura prima di queste verifiche.
 
@@ -36,7 +37,7 @@ L'email non arrivata a Yahoo NON equivale a un'adesione persa: la persona potreb
 - Prima di salvare controlla se l'adesione esiste già; dopo il salvataggio verifica che il documento sia visibile nel server.
 - Se il salvataggio sembra fallire per rete intermittente, controlla sul server se il documento è comparso; se non può verificarlo, non presenta una falsa conferma e conserva i campi del modulo.
 - L'identificativo del documento è l'UID dell'utente: nessuna nuova adesione per semplici tentativi ripetuti.
-- Le regole Firestore **non sono state cambiate** in questa PR; non si contano account non verificati.
+- Le regole del ramo PR #3 sono cambiate (interruttore server e lettura del proprio documento anche senza email verificata), ma NON sono state ancora pubblicate su Firebase. Le nuove adesioni richiedono ancora email verificata e consenso esplicito.
 
 ## Da eseguire SUL PROGETTO FIREBASE REALE — senza copiare credenziali in chat/GitHub
 1. Firebase console → Authentication → Users: conta utenti **email verificata / non verificata**, senza pubblicare identità.
