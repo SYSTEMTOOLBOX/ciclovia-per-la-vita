@@ -15,7 +15,7 @@ Sito dell'iniziativa civica indipendente per chiedere uno studio di fattibilità
 - Il codice imposta `launchEnabled = false`: **le adesioni pubbliche non sono ancora aperte**. Non cambiare il valore finché non sono stati eseguiti i controlli dal progetto Firebase reale.
 - Il totale pubblico delle adesioni usa esclusivamente dati aggregati; non pubblica nome e email.
 - In Firestore gli account devono vedere solo la propria adesione, secondo `firestore.rules`. **Queste regole devono ancora essere applicate e testate su Firebase**: inserirle nel repository non le distribuisce.
-- Script di copia di sicurezza cifrata e aggiornamento conteggio predisposti; la loro esecuzione effettiva richiede configurazione amministrativa e collaudo.
+- Primo backup cifrato reale eseguito e verificato su Windows il 22/11/2026 (0 adesioni). Test di connessione reale del contatore GitHub riuscito. Rimangono test reali Yahoo, confronto e deploy regole, ripristino isolato e adesione/revoca in produzione prima dell'apertura.
 
 ## Documenti e controlli
 - [Checklist di avvio](CHECKLIST_AVVIO.md)

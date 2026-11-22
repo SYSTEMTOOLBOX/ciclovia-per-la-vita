@@ -7,11 +7,11 @@
 - `adesioni-count.json` contiene solo `status`, `count`, `updatedAt` e descrizione: mai nomi, email o documenti personali.
 - La pagina adesioni mostra nome e email solamente nel profilo dell'utente autenticato; non esiste elenco pubblico.
 - Gli account della pagina `prova-email.html` sono solo prove di Firebase Authentication e **non** creano documenti nella collezione `adesioni`: non contano.
-- Non è ancora stato eseguito un backup effettivo dei dati: è disponibile soltanto il programma di backup cifrato da configurare e collaudare.
+- Il 22/11/2026 il promotore ha eseguito un backup cifrato REALE con il programma Windows: creato e verificato (0 adesioni). Il ripristino di questa copia in un ambiente separato non e' ancora stato collaudato.
 
-## Contatore orario predisposto, non ancora avviato
+## Contatore orario predisposto: test connessione reale superato, pubblicazione ancora chiusa
 
-Il workflow `.github/workflows/aggiorna-conteggio.yml` interroga la collezione riservata `adesioni` usando una query `count()`. Trasferisce al repository pubblico **solo il numero totale e l'orario**, non le singole adesioni. Si esegue al massimo una volta all'ora secondo la pianificazione e i limiti GitHub; non è un contatore in tempo reale. Al momento il workflow **non può funzionare** senza configurazione amministrativa.
+Il workflow `.github/workflows/aggiorna-conteggio.yml` interroga la collezione riservata `adesioni` usando una query `count()`. Trasferisce al repository pubblico **solo il numero totale e l'orario**, non le singole adesioni. Si esegue al massimo una volta all'ora secondo la pianificazione e i limiti GitHub; non è un contatore in tempo reale. Il secret GitHub e' gia' configurato. Il 22/11/2026 il test manuale ha interrogato Firebase con successo senza pubblicare alcuna cifra. La pubblicazione ordinaria resta chiusa finche' non viene aperta la raccolta.
 
 ### Checklist di sicurezza prima di attivare il conteggio
 
@@ -25,7 +25,7 @@ Il workflow `.github/workflows/aggiorna-conteggio.yml` interroga la collezione r
 
 GitHub Pages può non ricompilare il sito per un commit del GITHUB_TOKEN; il browser legge dunque la sola cifra dal file aggregato RAW pubblico, non dal database Firestore.
 
-## Backup cifrato gratuito (ANCORA DA ESEGUIRE)
+## Backup cifrato gratuito (prima copia creata e verificata; ripristino da collaudare)
 
 È disponibile `scripts/backup-adesioni.cjs`. Si esegue **solo sul PC del titolare**, mai come action pubblica e mai sulla pagina web.
 

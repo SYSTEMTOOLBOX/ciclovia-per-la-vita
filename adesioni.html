@@ -81,17 +81,18 @@
         <button class="btn secondary" id="reset-password" type="button">Password dimenticata</button>
       </div>
     </form>
-    <p class="muted">La creazione dell'account serve per verificare l'email e non registra automaticamente l'adesione. Prima di registrarti, leggi l'<a href="privacy.html" target="_blank" rel="noopener noreferrer">informativa privacy</a>: email e dati tecnici sono necessari per creare e proteggere l'account.</p>
+    <p class="muted"><strong>Registrazione dell’account ≠ adesione.</strong> Devi prima verificare l’email, poi compilare e confermare il modulo: soltanto quando compare «Adesione verificata nel database» hai aderito. Se perdi la connessione, accedi di nuovo per controllare lo stato. Leggi l’<a href="privacy.html" target="_blank" rel="noopener noreferrer">informativa privacy</a> prima di registrarti.</p>
   </section>
 
   <section class="card" id="verification" hidden aria-labelledby="verification-title">
     <h2 id="verification-title">Conferma l'indirizzo email</h2>
-    <p>Ti è stata inviata un'email con un link di verifica. Aprilo, poi torna qui e premi «Ho verificato l'email». Se non trovi il messaggio, controlla anche lo spam.</p>
+    <p>Per completare la registrazione devi aprire il link ricevuto via email. Controlla anche spam e posta indesiderata (per esempio su Yahoo). Se non arriva, usa «Invia di nuovo» oppure contatta il promotore. <strong>Finché l’email non è verificata e non confermi l’adesione, non risulti tra le adesioni registrate.</strong></p>
     <p class="muted" id="verification-address"></p>
     <div class="actions">
       <button class="btn" id="check-verification" type="button">Ho verificato l'email</button>
       <button class="btn secondary" id="resend-verification" type="button">Invia di nuovo</button>
       <button class="btn secondary log-out" type="button">Esci</button>
+      <button class="btn danger delete-account" type="button">Elimina il mio account</button>
     </div>
   </section>
 
@@ -164,7 +165,10 @@
       "auth/requires-recent-login": "La sessione non è più recente: ripeti la conferma con la password.",
       "auth/wrong-password": "Password non corretta.",
       "auth/invalid-password": "Password non corretta.",
-      "permission-denied": "Salvataggio non autorizzato: verifica la configurazione e le regole."
+      "permission-denied": "Salvataggio non autorizzato. Nessuna conferma di adesione: contatta il promotore.",
+      "unavailable": "Il database non è raggiungibile. I dati del modulo non vengono cancellati: riprova quando la connessione torna.",
+      "adhesion-not-confirmed": "Il server non ha confermato l’adesione. Accedi di nuovo per controllare se risulti già registrato: non compilare account multipli.",
+      "email-not-verified": "Devi prima verificare l’email. Nessuna adesione è stata registrata."
     };
     return errors[code] || "Operazione non riuscita. Riprova o contatta il promotore se il problema continua.";
   }
@@ -174,7 +178,7 @@
     const [
       { initializeApp },
       { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, reload, signOut, sendPasswordResetEmail, deleteUser, EmailAuthProvider, reauthenticateWithCredential },
-      { getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp }
+      { getFirestore, doc, getDocFromServer, runTransaction, deleteDoc, serverTimestamp }
     ] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js"),
@@ -198,20 +202,32 @@
       if (!user) { show("account"); return; }
       await reload(user);
       await user.getIdToken(true);
+      // La lettura del proprio documento funziona anche se la verifica email
+      // non e' piu' valida: l'utente deve poter revocare e cancellare i dati.
+      // Mai usare la cache del browser per certificare un'adesione.
+      let snapshot;
+      try {
+        snapshot = await getDocFromServer(doc(db, "adesioni", user.uid));
+      } catch (error) {
+        // Se il database e' temporaneamente offline, almeno il reinvio
+        // dell'email e la cancellazione dell'account rimangono disponibili.
+        if (user.emailVerified) throw error;
+      }
+      if (snapshot?.exists()) {
+        const name = snapshot.data()?.nome || "";
+        const emailState = user.emailVerified ? "Email verificata: " : "Email attualmente non verificata: ";
+        $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + emailState + (user.email || "") + ". Puoi ritirare il consenso e cancellare l'adesione.";
+        show("existing-adhesion");
+        return true;
+      }
       if (!user.emailVerified) {
         $("verification-address").textContent = user.email || "";
         show("verification");
-        return;
+        return false;
       }
-      const snapshot = await getDoc(doc(db, "adesioni", user.uid));
-      if (snapshot.exists()) {
-        const name = snapshot.data()?.nome || "";
-        $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + "Email verificata: " + (user.email || "") + ". Il tuo nome compare soltanto nel tuo profilo privato. Puoi ritirare il consenso e cancellare l'adesione.";
-        show("existing-adhesion");
-      } else {
-        $("verified-address").textContent = "Email verificata: " + (user.email || "");
-        show("new-adhesion");
-      }
+      $("verified-address").textContent = "Email verificata: " + (user.email || "");
+      show("new-adhesion");
+      return false;
     }
     onAuthStateChanged(auth,()=>guarded(refreshPanel), error => status(explain(error),true));
     $("create-account").addEventListener("click",()=>guarded(async()=>{
@@ -225,10 +241,15 @@
         $("account-form").reportValidity(); return;
       }
       const { user } = await createUserWithEmailAndPassword(auth,email,password);
-      await sendEmailVerification(user);
       $("account-password").value = "";
+      // L'account esiste già anche se il servizio di invio email fallisce.
+      let mailRequested = false;
+      try { await sendEmailVerification(user); mailRequested = true; }
+      catch (emailError) { console.warn("Verifica email:",emailError?.code||"error"); }
       await refreshPanel();
-      status("Account creato. Controlla la tua email per verificare l'indirizzo.");
+      status(mailRequested
+        ? "Account creato. Richiesta di invio email effettuata: controlla anche spam e Yahoo. Devi verificare l’indirizzo e poi confermare l’adesione."
+        : "Account creato, ma la richiesta di email non è riuscita. Premi «Invia di nuovo» dalla schermata di verifica: non hai ancora registrato un’adesione.", !mailRequested);
     }));
     $("account-form").addEventListener("submit",e=>{
       e.preventDefault(); guarded(async()=>{
@@ -245,12 +266,12 @@
       status("Se l'indirizzo è registrato, riceverai istruzioni per reimpostare la password.");
     }));
     $("check-verification").addEventListener("click",()=>guarded(async()=>{
-      await refreshPanel();
-      if (!auth.currentUser?.emailVerified) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
+      const hasAdhesion = await refreshPanel();
+      if (!auth.currentUser?.emailVerified && !hasAdhesion) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
     }));
     $("resend-verification").addEventListener("click",()=>guarded(async()=>{
       await sendEmailVerification(auth.currentUser);
-      status("Nuova email di verifica inviata. Controlla la posta.");
+      status("Richiesta di reinvio effettuata. Controlla anche spam e posta indesiderata. L’adesione NON è ancora registrata.");
     }));
     document.querySelectorAll(".log-out").forEach(button=>button.addEventListener("click",()=>guarded(async()=>{
       await signOut(auth); show("account");
@@ -262,19 +283,49 @@
         const user = auth.currentUser;
         await reload(user);
         await user.getIdToken(true);
-        if (!user.emailVerified) {show("verification"); throw new Error("email-not-verified");}
+        if (!user.emailVerified) {show("verification"); throw {code:"email-not-verified"};}
         const nome=$("nome").value.trim(), cognome=$("cognome").value.trim(), comune=$("comune").value.trim();
+        const consensoEsplicito=$("consenso").checked, maggiorenne=$("adulto").checked;
         if (nome.length<2 || cognome.length<2 || comune.length<2) {status("Completa tutti i campi.",true);return;}
-        await setDoc(doc(db,"adesioni",user.uid),{
-          nome,cognome,comune,email:user.email,
-          consensoEsplicito:true,
-          maggiorenne:true,
-          privacyVersion:"2026-11-19-v2",
-          creataIl:serverTimestamp()
-        });
+        const target = doc(db,"adesioni",user.uid);
+        // Idempotenza: se l'utente riprova dopo una disconnessione, non sovrascrivere nulla.
+        const prior = await getDocFromServer(target);
+        if (prior.exists()) {
+          if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
+          status("Questa adesione era già registrata e verificata nel database. Non occorre inviarla di nuovo.");
+          return;
+        }
+        try {
+          // La transazione fallisce offline e gestisce due schede concorrenti.
+          await runTransaction(db,async transaction=>{
+            const current=await transaction.get(target);
+            if(current.exists()) return;
+            transaction.set(target,{
+              nome,cognome,comune,email:user.email,
+              consensoEsplicito,maggiorenne,
+              privacyVersion:"2026-11-19-v2",
+              creataIl:serverTimestamp()
+            });
+          });
+        } catch (writeError) {
+          // Rete incerta: la scrittura potrebbe essere riuscita prima della perdita di risposta.
+          // Verifichiamo il documento sul SERVER prima di invitare a riprovare.
+          try {
+            const existing = await getDocFromServer(target);
+            if (existing.exists()) {
+              if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
+              $("adhesion-form").reset();
+              status("Adesione verificata nel database! Era già stata salvata, non devi ripetere l’operazione.");
+              return;
+            }
+          } catch (_) { /* Non possiamo confermare, conserviamo tutti i campi compilati. */ }
+          throw writeError;
+        }
+        const confirmed = await getDocFromServer(target);
+        if (!confirmed.exists()) throw {code:"adhesion-not-confirmed"};
+        if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
         $("adhesion-form").reset();
-        await refreshPanel();
-        status("Adesione civica registrata. Grazie per il tuo sostegno!");
+        status("Adesione verificata nel database! Grazie per il tuo sostegno.");
       });
     });
     $("delete-adhesion").addEventListener("click",()=>guarded(async()=>{

@@ -5,16 +5,18 @@
   const counters = document.querySelectorAll("[data-adesioni-count]");
   const dates = document.querySelectorAll("[data-adesioni-updated]");
   if (!counters.length) return;
-  function fallback() {
+  function fallback(closed = false) {
     counters.forEach(el => el.textContent = "Non disponibile");
-    dates.forEach(el => el.textContent = "Raccolta non ancora aperta");
+    dates.forEach(el => el.textContent = closed ? "Raccolta non ancora aperta" : "Conteggio temporaneamente non disponibile");
   }
   try {
     const res = await fetch("https://raw.githubusercontent.com/SYSTEMTOOLBOX/ciclovia-per-la-vita/main/adesioni-count.json", {cache: "no-store"});
     if (!res.ok) throw new Error("Conteggio non raggiungibile");
     const data = await res.json();
+    if (data.status === "pending") { fallback(true); return; }
     if (data.status !== "verified" || !Number.isSafeInteger(data.count) || data.count < 0 ||
-        typeof data.updatedAt !== "string" || !Number.isFinite(Date.parse(data.updatedAt))) {
+        typeof data.updatedAt !== "string" || !Number.isFinite(Date.parse(data.updatedAt)) ||
+        Date.parse(data.updatedAt) > Date.now() + 300000 || Date.now() - Date.parse(data.updatedAt) > 86400000) {
       fallback();
       return;
     }

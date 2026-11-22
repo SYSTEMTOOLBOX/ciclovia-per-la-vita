@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
@@ -34,6 +35,14 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           CONNECTION_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test_connection == true && '1' || '0' }}
         run: |
+          if [ "$CONNECTION_TEST" = "1" ] && [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "Test fallito: credenziale Firebase mancante."
+            exit 1
+          fi
+          if grep -q "export const launchEnabled = true;" firebase-config.js && [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "Contatore attivo senza credenziale."
+            exit 1
+          fi
           if [ -n "$FIREBASE_SERVICE_ACCOUNT_JSON" ] && { grep -q "export const launchEnabled = true;" firebase-config.js || [ "$CONNECTION_TEST" = "1" ]; }; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
@@ -42,7 +51,7 @@ jobs:
           fi
       - name: Installa SDK senza accesso alle credenziali
         if: steps.ready.outputs.enabled == 'true'
-        run: npm install --no-save --ignore-scripts --no-audit --no-fund firebase-admin@13
+        run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Calcola totale senza esportare dati personali
         if: steps.ready.outputs.enabled == 'true'
         env:
@@ -50,6 +59,7 @@ jobs:
           CICLOVIA_CONNECTION_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test_connection == true && '1' || '0' }}
         run: node scripts/update-adesioni-count.cjs
       - name: Pubblica soltanto il totale
+        if: steps.ready.outputs.enabled == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.test_connection == true)
         run: |
           if git diff --quiet -- adesioni-count.json; then
             echo "Nessun aggiornamento da pubblicare."
