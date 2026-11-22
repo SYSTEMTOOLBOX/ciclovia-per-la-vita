@@ -11,6 +11,13 @@ service cloud.firestore {
       return owner(uid) && request.auth.token.email_verified == true;
     }
 
+    // Interruttore amministrativo: il solo flag JavaScript non protegge il backend.
+    // Assente o falso = nuove adesioni chiuse. Non impedisce lettura e revoca.
+    function collectionOpen() {
+      return exists(/databases/$(database)/documents/config/raccolta) &&
+        get(/databases/$(database)/documents/config/raccolta).data.enabled == true;
+    }
+
     function validText(value, min, max) {
       return value is string &&
         value.size() >= min && value.size() <= max &&
@@ -43,7 +50,7 @@ service cloud.firestore {
     match /adesioni/{uid} {
       allow get: if verifiedOwner(uid);
       allow list: if false;
-      allow create: if verifiedOwner(uid) && validAdhesion();
+      allow create: if collectionOpen() && verifiedOwner(uid) && validAdhesion();
       // Non permettere sostituzioni o alterazioni dopo l'adesione.
       allow update: if false;
       // La revoca deve essere possibile anche con email non piu' verificata.

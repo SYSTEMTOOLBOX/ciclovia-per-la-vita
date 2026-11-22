@@ -16,5 +16,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verifica link, moduli, privacy e video
         run: node scripts/verify-site.cjs
+      - name: Test modulo, contatore e cifratura
+        run: npm test
+      - name: Authentication, regole e ripristino su emulatori isolati
+        run: npm run test:rules

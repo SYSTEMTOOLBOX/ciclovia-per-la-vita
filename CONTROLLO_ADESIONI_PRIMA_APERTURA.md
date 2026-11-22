@@ -3,6 +3,24 @@
 > **Stato:** preparazione e revisione. NON è una certificazione di affidabilità, né autorizza a cambiare \`launchEnabled\` a \`true\`.
 
 ## Differenza che ha creato il problema con Yahoo
+### Collaudo del ramo PR #3, 22 novembre 2026
+
+Superati 14 test automatici del modulo, contatore e cifratura; 6 test su emulatori
+Firebase isolati per regole, invii concorrenti, verifica email e ripristino;
+superato anche il controllo statico delle 4 pagine. I tre import Firebase CDN
+13.3.0 rispondono HTTP 200. Nessun account o adesione di produzione modificato.
+
+Le nuove regole aggiungono un interruttore server chiuso per impostazione
+predefinita. Non sono state distribuite in produzione. `launchEnabled` resta falso.
+Procedura eseguibile, limiti e protezioni: [RIPRISTINO_ADESIONI.md](RIPRISTINO_ADESIONI.md).
+
+Restano da verificare con accesso autorizzato: configurazione/regole effettivamente
+pubblicate, audit aggregato dei dati esistenti, consegna Yahoo reale, backup dei
+dati reali con ripristino isolato e primo run del contatore con il secret configurato.
+Il test Auth emulato non invia posta e non prova la consegna Yahoo.
+Non considerare la raccolta pronta all'apertura prima di queste verifiche.
+
+### Account e adesione
 1. **Authentication** può contenere un utente creato anche se l'email di verifica non arriva. È solo un ACCOUNT.
 2. \`emailVerified\` significa che l'indirizzo è stato verificato.
 3. La vera adesione esiste SOLO se è presente il documento \`adesioni/{uid}\` in Firestore. Il pulsante di conferma appare solo dopo la verifica email e il consenso esplicito.

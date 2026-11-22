@@ -177,7 +177,7 @@
     const [
       { initializeApp },
       { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, reload, signOut, sendPasswordResetEmail, deleteUser, EmailAuthProvider, reauthenticateWithCredential },
-      { getFirestore, doc, getDocFromServer, setDoc, deleteDoc, serverTimestamp }
+      { getFirestore, doc, getDocFromServer, runTransaction, deleteDoc, serverTimestamp }
     ] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js"),
@@ -212,9 +212,11 @@
         const name = snapshot.data()?.nome || "";
         $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + "Email verificata: " + (user.email || "") + ". Il tuo nome compare soltanto nel tuo profilo privato. Puoi ritirare il consenso e cancellare l'adesione.";
         show("existing-adhesion");
+        return true;
       } else {
         $("verified-address").textContent = "Email verificata: " + (user.email || "");
         show("new-adhesion");
+        return false;
       }
     }
     onAuthStateChanged(auth,()=>guarded(refreshPanel), error => status(explain(error),true));
@@ -271,25 +273,29 @@
         const user = auth.currentUser;
         await reload(user);
         await user.getIdToken(true);
-        if (!user.emailVerified) {show("verification"); throw new Error("email-not-verified");}
+        if (!user.emailVerified) {show("verification"); throw {code:"email-not-verified"};}
         const nome=$("nome").value.trim(), cognome=$("cognome").value.trim(), comune=$("comune").value.trim();
+        const consensoEsplicito=$("consenso").checked, maggiorenne=$("adulto").checked;
         if (nome.length<2 || cognome.length<2 || comune.length<2) {status("Completa tutti i campi.",true);return;}
         const target = doc(db,"adesioni",user.uid);
         // Idempotenza: se l'utente riprova dopo una disconnessione, non sovrascrivere nulla.
         const prior = await getDocFromServer(target);
         if (prior.exists()) {
-          await refreshPanel();
+          if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
           status("Questa adesione era già registrata e verificata nel database. Non occorre inviarla di nuovo.");
           return;
         }
         try {
-          // setDoc risolve solo quando il backend conferma la scrittura.
-          await setDoc(target,{
-            nome,cognome,comune,email:user.email,
-            consensoEsplicito:true,
-            maggiorenne:true,
-            privacyVersion:"2026-11-19-v2",
-            creataIl:serverTimestamp()
+          // La transazione fallisce offline e gestisce due schede concorrenti.
+          await runTransaction(db,async transaction=>{
+            const current=await transaction.get(target);
+            if(current.exists()) return;
+            transaction.set(target,{
+              nome,cognome,comune,email:user.email,
+              consensoEsplicito,maggiorenne,
+              privacyVersion:"2026-11-19-v2",
+              creataIl:serverTimestamp()
+            });
           });
         } catch (writeError) {
           // Rete incerta: la scrittura potrebbe essere riuscita prima della perdita di risposta.
@@ -297,7 +303,7 @@
           try {
             const existing = await getDocFromServer(target);
             if (existing.exists()) {
-              await refreshPanel();
+              if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
               $("adhesion-form").reset();
               status("Adesione verificata nel database! Era già stata salvata, non devi ripetere l’operazione.");
               return;
@@ -307,7 +313,7 @@
         }
         const confirmed = await getDocFromServer(target);
         if (!confirmed.exists()) throw {code:"adhesion-not-confirmed"};
-        await refreshPanel();
+        if (!await refreshPanel()) throw {code:"adhesion-not-confirmed"};
         $("adhesion-form").reset();
         status("Adesione verificata nel database! Grazie per il tuo sostegno.");
       });

@@ -16,8 +16,7 @@ async function main() {
   }
   const secret = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (!secret) {
-    console.log('Configurazione non ancora disponibile: nessun conteggio pubblicato.');
-    return;
+    throw new Error('Credenziale del contatore mancante.');
   }
   let credentials;
   try { credentials = JSON.parse(secret); }
@@ -33,7 +32,7 @@ async function main() {
     const result = await admin.firestore(app).collection('adesioni').count().get();
     const total = result.data().count;
     if (!Number.isSafeInteger(total) || total < 0) throw new Error('Conteggio Firestore non valido.');
-    if (!publicActive) {
+    if (connectionTest) {
       console.log('Test del collegamento Firebase riuscito. Raccolta chiusa: nessun conteggio pubblicato.');
       return;
     }
@@ -48,8 +47,8 @@ async function main() {
     await app.delete();
   }
 }
-main().catch(err => {
+main().catch(() => {
   // Non stampare mai la credenziale o documenti Firestore nei log.
-  console.error('Aggiornamento fallito:', err.message);
+  console.error('Aggiornamento fallito. Verificare configurazione e permessi del contatore.');
   process.exitCode = 1;
 });

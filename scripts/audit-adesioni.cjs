@@ -30,6 +30,8 @@ async function main() {
     const docs = await admin.firestore(app).collection('adesioni').get();
     let savedWithVerifiedEmail = 0, savedWithUnverifiedEmail = 0, orphanDocuments = 0;
     let brokenAdhesionSchema = 0;
+    const emails = new Set();
+    let duplicateEmails = 0;
     const savedUids = new Set();
     for (const doc of docs.docs) {
       savedUids.add(doc.id);
@@ -38,6 +40,11 @@ async function main() {
       else if (v === false) savedWithUnverifiedEmail++;
       else orphanDocuments++;
       const d = doc.data();
+      if(typeof d.email === 'string') {
+        const normalized=d.email.trim().toLowerCase();
+        if(emails.has(normalized)) duplicateEmails++;
+        emails.add(normalized);
+      }
       if (!d || d.consensoEsplicito !== true || d.maggiorenne !== true ||
           typeof d.nome !== 'string' || typeof d.cognome !== 'string' ||
           typeof d.comune !== 'string' || typeof d.email !== 'string' ||
@@ -62,13 +69,14 @@ async function main() {
       adesioniConEmailNonVerificata: savedWithUnverifiedEmail,
       adesioniSenzaAccount: orphanDocuments,
       documentiConCampiObbligatoriMancanti: brokenAdhesionSchema,
+      adesioniConEmailDuplicata: duplicateEmails,
       accountVerificatiSenzaAdesione: verifiedWithoutAdhesion,
       accountInAttesaEmailSenzaAdesione: pendingEmailWithoutAdhesion,
       contieneDatiPersonali: false,
       nota: 'Gli account di prova possono comparire tra i non aderenti. Nessuna cancellazione eseguita.',
     };
     console.log(JSON.stringify(summary, null, 2));
-    if (orphanDocuments || brokenAdhesionSchema) process.exitCode = 2;
+    if (orphanDocuments || brokenAdhesionSchema || duplicateEmails || savedWithUnverifiedEmail) process.exitCode = 2;
   } finally {
     await app.delete();
   }

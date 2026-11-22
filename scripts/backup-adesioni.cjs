@@ -8,7 +8,8 @@
 // CICLOVIA_BACKUP_DIR = cartella locale FUORI dal repository GitHub
 const fs = require('node:fs');
 const path = require('node:path');
-const crypto = require('node:crypto');
+const {encrypt,decrypt,encode,validate} = require('./backup-codec.cjs');
+const {isDeepStrictEqual} = require('node:util');
 const admin = require('firebase-admin');
 
 async function main() {
@@ -34,32 +35,22 @@ async function main() {
   try {
     const snapshot = await admin.firestore(app).collection('adesioni').get();
     const data = {
-      format:'ciclovia-adesioni-backup-v1',
+      format:'ciclovia-adesioni-backup-v2',
       sourceProject:'ciclovia-per-la-vita',
       backedUpAt:new Date().toISOString(),
       count:snapshot.size,
       // I dati personali sono solo in memoria prima di essere cifrati.
-      records:snapshot.docs.map(doc=>({uid:doc.id,fields:doc.data()}))
+      records:snapshot.docs.map(doc=>({uid:doc.id,fields:encode(doc.data())}))
     };
-    const salt = crypto.randomBytes(16);
-    const iv = crypto.randomBytes(12);
-    const key = crypto.scryptSync(password,salt,32,{N:16384,r:8,p:1});
-    const cipher = crypto.createCipheriv('aes-256-gcm',key,iv);
-    const plaintext = Buffer.from(JSON.stringify(data),'utf8');
-    const encrypted = Buffer.concat([cipher.update(plaintext),cipher.final()]);
-    const tag = cipher.getAuthTag();
-    const binary = Buffer.concat([Buffer.from('CICLOVIA1','ascii'),salt,iv,tag,encrypted]);
+    const binary = encrypt(validate(data),password);
 
     const timestamp = new Date().toISOString().replace(/[:.]/g,'-');
     const out = path.join(outputDir,'ciclovia-adesioni-'+timestamp+'.enc');
     fs.writeFileSync(out,binary,{flag:'wx',mode:0o600});
     // Verifica immediata del file cifrato (senza scrivere dati in chiaro).
     const check=fs.readFileSync(out);
-    const decipher=crypto.createDecipheriv('aes-256-gcm',key,check.subarray(25,37));
-    decipher.setAuthTag(check.subarray(37,53));
-    const clear=Buffer.concat([decipher.update(check.subarray(53)),decipher.final()]);
-    const parsed=JSON.parse(clear.toString('utf8'));
-    if(parsed.format!=='ciclovia-adesioni-backup-v1' || parsed.count!==snapshot.size) {
+    const parsed=validate(decrypt(check,password));
+    if(!isDeepStrictEqual(parsed,data)) {
       throw new Error('Verifica del backup non riuscita!');
     }
     console.log('Copia CIFRATA creata e verificata in locale:',out);
@@ -69,7 +60,7 @@ async function main() {
     await app.delete();
   }
 }
-main().catch(err=>{
-  console.error('Backup non completato:',err.message);
+main().catch(()=>{
+  console.error('Backup non completato. Verificare credenziale, destinazione esterna e passphrase.');
   process.exitCode=1;
 });
