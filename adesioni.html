@@ -92,6 +92,7 @@
       <button class="btn" id="check-verification" type="button">Ho verificato l'email</button>
       <button class="btn secondary" id="resend-verification" type="button">Invia di nuovo</button>
       <button class="btn secondary log-out" type="button">Esci</button>
+      <button class="btn danger delete-account" type="button">Elimina il mio account</button>
     </div>
   </section>
 
@@ -201,23 +202,32 @@
       if (!user) { show("account"); return; }
       await reload(user);
       await user.getIdToken(true);
+      // La lettura del proprio documento funziona anche se la verifica email
+      // non e' piu' valida: l'utente deve poter revocare e cancellare i dati.
+      // Mai usare la cache del browser per certificare un'adesione.
+      let snapshot;
+      try {
+        snapshot = await getDocFromServer(doc(db, "adesioni", user.uid));
+      } catch (error) {
+        // Se il database e' temporaneamente offline, almeno il reinvio
+        // dell'email e la cancellazione dell'account rimangono disponibili.
+        if (user.emailVerified) throw error;
+      }
+      if (snapshot?.exists()) {
+        const name = snapshot.data()?.nome || "";
+        const emailState = user.emailVerified ? "Email verificata: " : "Email attualmente non verificata: ";
+        $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + emailState + (user.email || "") + ". Puoi ritirare il consenso e cancellare l'adesione.";
+        show("existing-adhesion");
+        return true;
+      }
       if (!user.emailVerified) {
         $("verification-address").textContent = user.email || "";
         show("verification");
-        return;
-      }
-      // Lettura forzata dal server: mai confermare un’adesione sulla sola cache del browser.
-      const snapshot = await getDocFromServer(doc(db, "adesioni", user.uid));
-      if (snapshot.exists()) {
-        const name = snapshot.data()?.nome || "";
-        $("existing-details").textContent = (name ? "Benvenuto/a, " + name + ". " : "") + "Email verificata: " + (user.email || "") + ". Il tuo nome compare soltanto nel tuo profilo privato. Puoi ritirare il consenso e cancellare l'adesione.";
-        show("existing-adhesion");
-        return true;
-      } else {
-        $("verified-address").textContent = "Email verificata: " + (user.email || "");
-        show("new-adhesion");
         return false;
       }
+      $("verified-address").textContent = "Email verificata: " + (user.email || "");
+      show("new-adhesion");
+      return false;
     }
     onAuthStateChanged(auth,()=>guarded(refreshPanel), error => status(explain(error),true));
     $("create-account").addEventListener("click",()=>guarded(async()=>{
