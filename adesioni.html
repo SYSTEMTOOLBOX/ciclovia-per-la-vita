@@ -266,8 +266,8 @@
       status("Se l'indirizzo è registrato, riceverai istruzioni per reimpostare la password.");
     }));
     $("check-verification").addEventListener("click",()=>guarded(async()=>{
-      await refreshPanel();
-      if (!auth.currentUser?.emailVerified) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
+      const hasAdhesion = await refreshPanel();
+      if (!auth.currentUser?.emailVerified && !hasAdhesion) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
     }));
     $("resend-verification").addEventListener("click",()=>guarded(async()=>{
       await sendEmailVerification(auth.currentUser);
