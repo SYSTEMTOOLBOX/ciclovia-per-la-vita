@@ -3,6 +3,10 @@ const fs = require('node:fs');
 const {isDeepStrictEqual} = require('node:util');
 const {decrypt,validate,encode,decode} = require('./backup-codec.cjs');
 
+function verifyBackup(filename,password) {
+  return validate(decrypt(fs.readFileSync(filename),password));
+}
+
 async function restore(db, data, types) {
   validate(data);
   // Prepara tutti i valori prima di qualsiasi scrittura.
@@ -23,7 +27,7 @@ async function restore(db, data, types) {
 async function main() {
   const [filename,mode='--verify-only']=process.argv.slice(2);
   if (!filename || !['--verify-only','--restore'].includes(mode)) throw new Error('Uso: node scripts/restore-adesioni.cjs FILE [--verify-only|--restore]');
-  const data=validate(decrypt(fs.readFileSync(filename),process.env.CICLOVIA_BACKUP_PASSPHRASE));
+  const data=verifyBackup(filename,process.env.CICLOVIA_BACKUP_PASSPHRASE);
   if(mode==='--verify-only') {console.log('Integrita backup verificata. Documenti:',data.count);return;}
   const projectId=process.env.CICLOVIA_RESTORE_PROJECT;
   if(!projectId || projectId==='ciclovia-per-la-vita' || process.env.CICLOVIA_CONFIRM_RESTORE!==projectId) throw new Error('Ripristino consentito solo su progetto isolato esplicitamente confermato.');
@@ -41,4 +45,4 @@ async function main() {
   finally {await app.delete();}
 }
 if(require.main===module) main().catch(()=>{console.error('Ripristino non completato. Verificare passphrase, manifest e progetto isolato; non riutilizzare una destinazione parzialmente ripristinata.');process.exitCode=1;});
-module.exports={restore};
+module.exports={restore,verifyBackup};
