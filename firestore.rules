@@ -18,18 +18,6 @@ service cloud.firestore {
         get(/databases/$(database)/documents/config/raccolta).data.enabled == true;
     }
 
-    // Collaudo controllato: nessuna adesione pubblica.
-    // Soltanto gli indirizzi email verificati presenti in un elenco
-    // amministrativo possono salvare il loro documento durante la prova.
-    // Disattivato se il documento e' assente o enabled non e' true.
-    function collectionTestAllowed() {
-      return exists(/databases/$(database)/documents/config/collaudo) &&
-        get(/databases/$(database)/documents/config/collaudo).data.enabled == true &&
-        get(/databases/$(database)/documents/config/collaudo).data.testEmails is list &&
-        request.auth.token.email in
-          get(/databases/$(database)/documents/config/collaudo).data.testEmails;
-    }
-
     function validText(value, min, max) {
       return value is string &&
         value.size() >= min && value.size() <= max &&
@@ -64,10 +52,8 @@ service cloud.firestore {
       // l'email non risulta piu' verificata: il nuovo inserimento resta vietato.
       allow get: if owner(uid);
       allow list: if false;
-      // In collaudo la raccolta pubblica resta spenta. Accesso limitato agli
-      // indirizzi autorizzati, sempre verificati e con consenso valido.
-      allow create: if verifiedOwner(uid) && validAdhesion() &&
-        (collectionOpen() || collectionTestAllowed());
+      // Le prove riservate sono concluse: un solo interruttore autorizzato.
+      allow create: if collectionOpen() && verifiedOwner(uid) && validAdhesion();
       // Non permettere sostituzioni o alterazioni dopo l'adesione.
       allow update: if false;
       // La revoca deve essere possibile anche con email non piu' verificata.
