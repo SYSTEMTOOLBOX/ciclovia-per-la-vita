@@ -30,7 +30,13 @@ test('regole: anonimi, non verificati e altri utenti esclusi',async()=>{
   const own=db('owner');
   await assertSucceeds(setDoc(doc(own,'adesioni/owner'),fields('owner')));
   await assertSucceeds(getDoc(doc(own,'adesioni/owner')));
-  for(const other of [env.unauthenticatedContext().firestore(),db('owner',false),db('other')]) {
+  // Sui documenti propri la lettura e la revoca rimangono disponibili
+  // anche se la verifica email viene persa; creare nuove adesioni no.
+  const ownNotVerified = db('owner',false);
+  await assertSucceeds(getDoc(doc(ownNotVerified,'adesioni/owner')));
+  await assertFails(setDoc(doc(ownNotVerified,'adesioni/unverified'),fields('owner')));
+  await assertFails(getDocs(collection(ownNotVerified,'adesioni')));
+  for(const other of [env.unauthenticatedContext().firestore(),db('other')]) {
     await assertFails(getDoc(doc(other,'adesioni/owner')));
     await assertFails(setDoc(doc(other,'adesioni/forbidden'),fields('other')));
     await assertFails(getDocs(collection(other,'adesioni')));
