@@ -31,6 +31,15 @@ test('fallimento email conserva account e propone reinvio senza confermare adesi
   const h=await setup({verified:false,mailError:true});await h.el('create-account').click();
   assert.match(h.el('feedback').textContent,/Account creato, ma/);assert.equal(h.el('verification').hidden,false);assert.equal(h.state().writes,0);
 });
+test('adesione propria visibile anche con email non verificata e account cancellabile',async()=>{
+  const h=await setup({verified:false,existing:true});
+  await h.el('check-verification').click();
+  assert.equal(h.el('existing-adhesion').hidden,false);
+  assert.match(h.el('existing-details').textContent,/non verificata/);
+  assert.ok(h.el('delete-account-panel'));
+  // Il pulsante di cancellazione e' disponibile anche durante la verifica.
+  assert.match(html,/id="verification"[\\s\\S]*?delete-account/);
+});
 test('risposta persa recuperata solo se la lettura server conferma',async()=>{
   const h=await setup({lostAck:true});await h.submit();
   assert.match(h.el('feedback').textContent,/Adesione verificata/);assert.equal(h.state().writes,1);
