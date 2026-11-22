@@ -38,7 +38,7 @@ test('adesione propria visibile anche con email non verificata e account cancell
   assert.match(h.el('existing-details').textContent,/non verificata/);
   assert.ok(h.el('delete-account-panel'));
   // Il pulsante di cancellazione e' disponibile anche durante la verifica.
-  assert.match(html,/id="verification"[\\s\\S]*?delete-account/);
+  assert.match(html,/id="verification"[\s\S]*?delete-account/);
 });
 test('risposta persa recuperata solo se la lettura server conferma',async()=>{
   const h=await setup({lostAck:true});await h.submit();
