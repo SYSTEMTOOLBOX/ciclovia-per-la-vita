@@ -48,7 +48,9 @@ service cloud.firestore {
     }
 
     match /adesioni/{uid} {
-      allow get: if verifiedOwner(uid);
+      // La lettura del proprio documento serve anche per la revoca quando
+      // l'email non risulta piu' verificata: il nuovo inserimento resta vietato.
+      allow get: if owner(uid);
       allow list: if false;
       allow create: if collectionOpen() && verifiedOwner(uid) && validAdhesion();
       // Non permettere sostituzioni o alterazioni dopo l'adesione.
