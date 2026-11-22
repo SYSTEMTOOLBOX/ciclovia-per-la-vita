@@ -23,33 +23,18 @@ test('raccolta chiusa sul server anche aggirando il flag JavaScript',async()=>{
   await assertFails(setDoc(doc(own,'config/raccolta'),{enabled:true}));
   await env.withSecurityRulesDisabled(async c=>setDoc(doc(c.firestore(),'config/raccolta'),{enabled:false}));
   await assertFails(setDoc(doc(own,'adesioni/closed'),fields('closed')));
-  // Nel collaudo la raccolta pubblica resta chiusa.
 });
-test('collaudo riservato: solo email in lista, verificata e proprietaria',async()=>{
+test('l'interruttore di vecchio collaudo non può più consentire adesioni',async()=>{
   const allowed = db('allowed');
-  const outsider = db('outsider');
-  const unverified = db('allowed',false);
   await env.withSecurityRulesDisabled(async c =>
     setDoc(doc(c.firestore(),'config/collaudo'),{
-      enabled:true, testEmails:['allowed@example.test','second@example.test']
-    })
-  );
-  await assertFails(setDoc(doc(outsider,'adesioni/outsider'),fields('outsider')));
-  await assertFails(setDoc(doc(unverified,'adesioni/allowed'),fields('allowed')));
-  await assertFails(setDoc(doc(allowed,'adesioni/another'),fields('allowed')));
-  await assertFails(getDoc(doc(outsider,'config/collaudo')));
-  await assertFails(getDoc(doc(allowed,'config/collaudo')));
-  await assertFails(setDoc(doc(outsider,'config/collaudo'),{enabled:true,testEmails:['outsider@example.test']}));
-  await assertSucceeds(setDoc(doc(allowed,'adesioni/allowed'),fields('allowed')));
-  await assertSucceeds(getDoc(doc(allowed,'adesioni/allowed')));
-  await assertSucceeds(deleteDoc(doc(allowed,'adesioni/allowed')));
-  await env.withSecurityRulesDisabled(async c =>
-    setDoc(doc(c.firestore(),'config/collaudo'),{
-      enabled:false, testEmails:['allowed@example.test','second@example.test']
+      enabled:true, testEmails:['allowed@example.test']
     })
   );
   await assertFails(setDoc(doc(allowed,'adesioni/allowed'),fields('allowed')));
-  // Ora abilitiamo solo l'emulatore demo per gli altri test gia' presenti.
+  await assertFails(getDoc(doc(allowed,'config/collaudo')));
+  await assertFails(setDoc(doc(allowed,'config/collaudo'),{enabled:true}));
+  // Solo l'interruttore di apertura ufficiale può dare accesso alle nuove adesioni.
   await env.withSecurityRulesDisabled(async c =>
     setDoc(doc(c.firestore(),'config/raccolta'),{enabled:true})
   );
