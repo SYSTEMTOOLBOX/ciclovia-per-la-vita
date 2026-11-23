@@ -176,7 +176,7 @@
         await showUser();
         status(returnAvailable
           ? "Richiesta di verifica inviata. Apri l'email, verifica l'indirizzo e premi «Continua» per tornare qui."
-          : "Richiesta di verifica inviata, ma il ritorno automatico al sito non è configurato. Dopo la conferma riapri questa pagina.");
+          : "Richiesta di verifica inviata, ma il collegamento di ritorno al sito non è configurato. Dopo la conferma riapri questa pagina.");
       }catch(e){
         await showUser();
         status("Account creato, ma non è stato possibile inviare l'email. Usa il pulsante «Rimanda l'email» oppure contatta il promotore.",true);
