@@ -188,6 +188,23 @@
     ]);
     const auth = getAuth(initializeApp(firebaseConfig));
     auth.languageCode = "it"; // Email di verifica e recupero password in italiano
+    // Dopo la conferma Firebase offre un collegamento per tornare al modulo.
+    // Per attivarlo, systemtoolbox.github.io deve essere nei domini autorizzati.
+    const verificationReturn = {
+      url: "https://systemtoolbox.github.io/ciclovia-per-la-vita/adesioni.html",
+      handleCodeInApp: false
+    };
+    async function sendVerification(user) {
+      try {
+        await sendEmailVerification(user, verificationReturn);
+        return true;
+      } catch (error) {
+        if (!["auth/unauthorized-continue-uri", "auth/invalid-continue-uri"].includes(error?.code)) throw error;
+        console.warn("Dominio di ritorno non autorizzato:", error.code);
+        await sendEmailVerification(user);
+        return false;
+      }
+    }
     const db = getFirestore();
     let busy = false;
     async function guarded(fn) {
@@ -246,11 +263,12 @@
       $("account-password").value = "";
       // L'account esiste già anche se il servizio di invio email fallisce.
       let mailRequested = false;
-      try { await sendEmailVerification(user); mailRequested = true; }
+      let returnAvailable = false;
+      try { returnAvailable = await sendVerification(user); mailRequested = true; }
       catch (emailError) { console.warn("Verifica email:",emailError?.code||"error"); }
       await refreshPanel();
       status(mailRequested
-        ? "Account creato. Richiesta di invio email effettuata: controlla anche spam e Yahoo. Devi verificare l’indirizzo e poi confermare l’adesione."
+        ? "Account creato. Controlla la posta, verifica l'email" + (returnAvailable ? " e premi «Continua» per rientrare nel sito." : " e poi riapri la pagina delle adesioni.") + " Devi ancora confermare l'adesione."
         : "Account creato, ma la richiesta di email non è riuscita. Premi «Invia di nuovo» dalla schermata di verifica: non hai ancora registrato un’adesione.", !mailRequested);
     }));
     $("account-form").addEventListener("submit",e=>{
@@ -272,8 +290,10 @@
       if (!auth.currentUser?.emailVerified && !hasAdhesion) status("Email non ancora verificata. Apri prima il link ricevuto.",true);
     }));
     $("resend-verification").addEventListener("click",()=>guarded(async()=>{
-      await sendEmailVerification(auth.currentUser);
-      status("Richiesta di reinvio effettuata. Controlla anche spam e posta indesiderata. L’adesione NON è ancora registrata.");
+      const returnAvailable = await sendVerification(auth.currentUser);
+      status("Richiesta di reinvio effettuata. Controlla anche spam e posta indesiderata. " +
+        (returnAvailable ? "Dopo la verifica premi «Continua» per tornare qui. " : "Dopo la verifica riapri questa pagina. ") +
+        "L'adesione NON è ancora registrata.");
     }));
     document.querySelectorAll(".log-out").forEach(button=>button.addEventListener("click",()=>guarded(async()=>{
       await signOut(auth); show("account");
