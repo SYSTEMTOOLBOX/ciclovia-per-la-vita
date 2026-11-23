@@ -121,6 +121,24 @@
     const app=initializeApp(firebaseConfig);
     const auth=getAuth(app);
     auth.languageCode="it";
+    // Il gestore Firebase verifica l'email e mostra il tasto Continua per tornare alla Ciclovia.
+    // Il dominio systemtoolbox.github.io deve essere autorizzato in Firebase Authentication.
+    const verificationReturn = {
+      url: "https://systemtoolbox.github.io/ciclovia-per-la-vita/prova-email.html",
+      handleCodeInApp: false
+    };
+    async function sendVerification(user) {
+      try {
+        await sendEmailVerification(user, verificationReturn);
+        return true;
+      } catch (error) {
+        // Il collaudo non deve impedire la verifica se manca ancora il dominio autorizzato.
+        if (!["auth/unauthorized-continue-uri", "auth/invalid-continue-uri"].includes(error?.code)) throw error;
+        console.warn("Dominio di ritorno non autorizzato:", error.code);
+        await sendEmailVerification(user);
+        return false;
+      }
+    }
     let busy=false;
     const run=async work=>{
       if(busy)return;
@@ -154,9 +172,11 @@
       const {user}=await createUserWithEmailAndPassword(auth,email,password);
       $("password").value="";
       try{
-        await sendEmailVerification(user);
+        const returnAvailable = await sendVerification(user);
         await showUser();
-        status("Account creato ed email di verifica inviata. Controlla anche lo spam.");
+        status(returnAvailable
+          ? "Richiesta di verifica inviata. Apri l'email, verifica l'indirizzo e premi «Continua» per tornare qui."
+          : "Richiesta di verifica inviata, ma il collegamento di ritorno al sito non è configurato. Dopo la conferma riapri questa pagina.");
       }catch(e){
         await showUser();
         status("Account creato, ma non è stato possibile inviare l'email. Usa il pulsante «Rimanda l'email» oppure contatta il promotore.",true);
@@ -179,8 +199,10 @@
     }));
     $("resend").addEventListener("click",()=>run(async()=>{
       if(!auth.currentUser)return;
-      await sendEmailVerification(auth.currentUser);
-      status("Email di verifica inviata di nuovo. Controlla anche lo spam.");
+      const returnAvailable = await sendVerification(auth.currentUser);
+      status(returnAvailable
+        ? "Richiesta di reinvio effettuata. Apri il link, poi premi «Continua» per tornare qui. Controlla anche lo spam."
+        : "Richiesta di reinvio effettuata. Dopo aver verificato l'email riapri questa pagina: il dominio di ritorno va ancora autorizzato.");
     }));
     $("logout").addEventListener("click",()=>run(async()=>{
       await signOut(auth);
