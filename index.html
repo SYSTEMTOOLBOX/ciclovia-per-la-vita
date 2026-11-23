@@ -465,7 +465,7 @@
         <div class="share-poster-action">
           <strong>Locandina stampabile · PDF A4</strong>
           <p>Immagine illustrativa del progetto, con aree giochi, punti ristoro, ciclisti, persone che corrono e passeggiano.</p>
-          <a class="btn btn-dark" id="scarica-locandina" href="locandina_ciclovia_per_la_vita_A4_aggiornata.pdf" download="Una_Ciclovia_per_la_Vita_Locandina_A4.pdf" hidden>Scarica la locandina PDF ↓</a>
+          <a class="btn btn-dark" id="scarica-locandina" data-pdf-url="locandina_ciclovia_per_la_vita_A4_aggiornata.pdf" download="Una_Ciclovia_per_la_Vita_Locandina_A4.pdf" hidden>Scarica la locandina PDF ↓</a>
           <small>Il QR code rimanda alla raccolta di adesioni civiche online, non a una firma autenticata di una petizione ufficiale.</small>
         </div>
       </div>
@@ -598,9 +598,11 @@
       // dopo l'apertura e soltanto se il PDF A4 esiste realmente su GitHub Pages.
       const poster = document.getElementById("diffondi");
       const posterLink = document.getElementById("scarica-locandina");
-      fetch(posterLink.href, { method: "HEAD", cache: "no-store" })
+      const posterUrl = new URL(posterLink.dataset.pdfUrl, document.baseURI);
+      fetch(posterUrl.href, { method: "HEAD", cache: "no-store" })
         .then(res => {
           if (!res.ok || !(res.headers.get("content-type") || "").toLowerCase().includes("application/pdf")) return;
+          posterLink.href = posterUrl.href;
           posterLink.hidden = false;
           poster.hidden = false;
         })
