@@ -164,6 +164,19 @@
     details summary:after{content:"+";font-size:1.4rem;line-height:1;color:#648364}
     details[open] summary:after{content:"−"}
     details p{font-size:.89rem;color:#637569;line-height:1.65;border-top:1px solid #e9ede5;padding-top:17px;margin-bottom:19px}
+
+    /* La locandina resta nascosta finché la raccolta non è aperta
+       e il PDF non è effettivamente disponibile sul sito. */
+    #diffondi[hidden],#scarica-locandina[hidden]{display:none!important}
+    .share-poster{background:#f3f8ed}
+    .share-poster-layout{display:flex;align-items:center;gap:48px;justify-content:space-between}
+    .share-poster-copy{max-width:680px}
+    .share-poster h2{font-size:clamp(2rem,4vw,3.3rem);line-height:1.09;margin:8px 0 18px}
+    .share-poster p{color:#506b5a;line-height:1.6}
+    .share-poster-action{background:white;border:1px solid #d6e5d1;border-radius:22px;padding:30px;max-width:380px;width:100%}
+    .share-poster-action .btn{margin-top:12px;white-space:normal;text-align:center;width:100%}
+    .share-poster-action small{display:block;line-height:1.5;color:#5f7563;margin-top:15px}
+    @media(max-width:760px){.share-poster-layout{flex-direction:column;align-items:stretch;gap:22px}}
     .final-cta{background:#d8f17d;color:var(--forest);padding:76px 0}
     .final-row{display:flex;align-items:center;justify-content:space-between;gap:32px}
     .final-row h2{font-size:clamp(2.3rem,4vw,4.25rem);margin:0;max-width:700px}
@@ -439,6 +452,25 @@
       </div>
     </section>
 
+
+    <!-- Disponibile soltanto dopo l'apertura ufficiale e quando il PDF è pubblicato. -->
+    <section class="block share-poster" id="diffondi" aria-labelledby="diffondi-title" hidden>
+      <div class="container share-poster-layout">
+        <div class="share-poster-copy">
+          <div class="eyebrow section-label">Aiutaci a far conoscere l'iniziativa</div>
+          <h2 id="diffondi-title">Una locandina da esporre. Una proposta da condividere.</h2>
+          <p>Hai un bar, un negozio, un'associazione o vuoi parlarne nel tuo quartiere? Scarica e stampa liberamente la locandina A4 della Ciclovia per la Vita: il QR code porta direttamente alla pagina delle adesioni civiche.</p>
+          <p>La stampa è volontaria e a carico di chi sceglie di esporla: non chiediamo contributi e non raccogliamo pagamenti.</p>
+        </div>
+        <div class="share-poster-action">
+          <strong>Locandina stampabile · PDF A4</strong>
+          <p>Immagine illustrativa del progetto, con aree giochi, punti ristoro, ciclisti, persone che corrono e passeggiano.</p>
+          <a class="btn btn-dark" id="scarica-locandina" href="locandina_ciclovia_per_la_vita_A4_aggiornata.pdf" download="Una_Ciclovia_per_la_Vita_Locandina_A4.pdf" hidden>Scarica la locandina PDF ↓</a>
+          <small>Il QR code rimanda alla raccolta di adesioni civiche online, non a una firma autenticata di una petizione ufficiale.</small>
+        </div>
+      </div>
+    </section>
+
     <section class="final-cta"><div class="container final-row"><h2>Una domanda semplice:<br>e se potessimo andarci <em>in bici?</em></h2><a class="btn btn-dark" href="#partecipa">Racconta come la useresti <span aria-hidden="true">↑</span></a></div></section>
   </main>
 
@@ -562,6 +594,17 @@
       const note = document.getElementById("stato-raccolta-note");
       if (home) home.textContent = "Le adesioni civiche online sono aperte!";
       if (note) note.textContent = "La pagina delle adesioni è aperta: puoi registrare il tuo sostegno dopo aver verificato l'email e accettato l'informativa.";
+      // Evita di mostrare un link rotto: la locandina è proposta solo
+      // dopo l'apertura e soltanto se il PDF A4 esiste realmente su GitHub Pages.
+      const poster = document.getElementById("diffondi");
+      const posterLink = document.getElementById("scarica-locandina");
+      fetch(posterLink.href, { method: "HEAD", cache: "no-store" })
+        .then(res => {
+          if (!res.ok || !(res.headers.get("content-type") || "").toLowerCase().includes("application/pdf")) return;
+          posterLink.hidden = false;
+          poster.hidden = false;
+        })
+        .catch(() => {});
     }
   </script>
   <script src="counter-adesioni.js" defer></script>
