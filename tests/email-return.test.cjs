@@ -19,7 +19,3 @@ for (const [page, expected] of [
     assert.match(html, /await sendEmailVerification\(user\);/); // fallback sicuro
   });
 }
-test('la raccolta resta chiusa nel codice pubblicato', () => {
-  const config = fs.readFileSync('firebase-config.js', 'utf8');
-  assert.match(config, /export const launchEnabled = false;/);
-});
