@@ -40,7 +40,14 @@
     .warning {border-left-color:#cc9651;background:#fff4dd}
     #feedback {padding:14px 18px;border-radius:9px;background:#e6f0df;margin:20px 0;line-height:1.5}
     #feedback.error {background:#ffebe7;color:#853627}
-    .muted {font-size:.9rem;color:#5c6c63}
+    .adhesion-total{background:#173c2e;color:#fff;border:1px solid #335c42;border-radius:23px;box-shadow:0 17px 45px #1f43221e;padding:clamp(26px,6vw,43px)}
+    .adhesion-total-eyebrow{display:block;text-transform:uppercase;letter-spacing:.12em;color:#daf39d;font-size:.76rem;font-weight:850}
+    .adhesion-total-number{display:block;color:#d5f478;line-height:1.03;letter-spacing:-.07em;font-size:clamp(2.15rem,5vw,3.1rem);font-weight:950;margin:14px 0 6px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+    .adhesion-total-number[data-counter-state="verified"]{font-size:clamp(4.3rem,13vw,7rem);letter-spacing:-.085em}
+    .adhesion-total-label{display:block;color:#fff;font-weight:850;font-size:1.1rem}
+    .adhesion-total-updated{display:block;color:#c7d7ca;font-size:.84rem;margin-top:13px}
+    .adhesion-total-note{color:#dce9dc;font-size:.83rem;line-height:1.7;margin:19px 0 0}
+        .muted {font-size:.9rem;color:#5c6c63}
     footer {border-top:1px solid #d5e1d1;padding:20px;color:#60736a;font-size:.83rem;line-height:1.6}
     @media(max-width:600px){.grid{grid-template-columns:1fr}.wrap{margin-top:28px}}
   </style>
@@ -52,11 +59,12 @@
   <h1>La tua adesione<br>per la ciclovia.</h1>
   <p class="lead">Sostieni la richiesta di valutare una ciclovia lungo il tracciato Chivasso–Asti. Nessuna firma viene pubblicata. La partecipazione è volontaria.</p>
   <p class="note warning"><strong>Attenzione:</strong> queste sono adesioni digitali di sostegno civico, non firme autenticate per una petizione ufficiale alla Regione Piemonte.</p>
-  <section class="card" aria-label="Conteggio adesioni" style="background:#edf5e5">
-    <strong style="display:block;font-size:.9rem">Adesioni civiche confermate</strong>
-    <div data-adesioni-count style="font-size:clamp(2rem,7vw,3rem);font-weight:900;letter-spacing:-.05em">In preparazione</div>
-    <span class="muted" data-adesioni-updated>Raccolta non ancora aperta</span>
-    <p class="muted">Questo totale è aggregato e non mostra nomi o email. Gli account di prova non vengono conteggiati. Le adesioni non sono firme autenticate.</p>
+  <section class="card adhesion-total" aria-label="Totale pubblico delle adesioni civiche">
+    <span class="adhesion-total-eyebrow">La voce del territorio</span>
+    <strong class="adhesion-total-number" data-adesioni-count aria-live="polite">—</strong>
+    <span class="adhesion-total-label">adesioni civiche confermate</span>
+    <span class="adhesion-total-updated" data-adesioni-updated>Raccolta non ancora aperta</span>
+    <p class="adhesion-total-note">Il totale è aggregato e aggiornato periodicamente, non in tempo reale. Le registrazioni email non si contano: solo le adesioni confermate. Nessun nome o indirizzo email viene mostrato. Non sono firme autenticate.</p>
   </section>
   <p id="feedback" role="status" aria-live="polite" hidden></p>
 
