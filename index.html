@@ -117,7 +117,8 @@
     .route-titles{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:49px}
     .route-titles strong{font-size:1rem;letter-spacing:.05em}
     .route-titles span{font-size:.72rem;color:#a8c2af}
-    .stations{display:grid;grid-template-columns:repeat(9,minmax(95px,1fr));position:relative;list-style:none;padding:0;margin:0;z-index:1}
+    .stations-scroll{overflow-x:auto;padding:0 0 14px;scrollbar-color:#d5f478 #294c3d;scrollbar-width:thin}
+    .stations{display:grid;grid-template-columns:repeat(17,minmax(145px,1fr));min-width:2465px;position:relative;list-style:none;padding:0;margin:0;z-index:1}
     .stations:before{content:"";height:5px;left:7px;right:7px;position:absolute;top:9px;background:var(--lime);border-radius:100px}
     .stations li{padding-right:5px;position:relative;min-width:0}
     .stations li:before{content:"";width:15px;height:15px;border-radius:50%;background:var(--forest);border:4px solid var(--lime);display:block;position:relative;margin-bottom:20px;z-index:2}
@@ -209,8 +210,13 @@
       h1{font-size:clamp(3.3rem,6vw,5.1rem)}
       .benefits-grid{grid-template-columns:repeat(2,1fr)}
       .metric{padding:23px 20px}
-      .stations{overflow-x:auto;min-width:900px}
-      .route-map{overflow-x:auto}
+      .stations-scroll{overflow:visible;padding:0}
+      .stations{display:flex;flex-direction:column;min-width:0;gap:0}
+      .stations:before{width:5px;height:calc(100% - 18px);left:6px;right:auto;top:9px}
+      .stations li{display:flex;align-items:flex-start;gap:14px;min-height:40px;padding:0}
+      .stations li:before{margin:3px 0 0;flex:none}
+      .stations li strong{font-size:.87rem;line-height:1.45}
+      .route-map{overflow:hidden}
     }
     @media(max-width:760px){
       .notice{font-size:10px;line-height:1.35}
@@ -382,10 +388,30 @@
     <section class="block route-section" id="tracciato">
       <div class="container">
         <div class="route-head"><div><div class="eyebrow section-label">Il corridoio esistente</div><h2>Da Chivasso ad Asti.<br>Passando per casa nostra.</h2></div><p>Non proponiamo una pista parallela da inventare tra ponti e gallerie: chiediamo di studiare <strong>la riconversione dell'intero sedime ferroviario</strong>, comprese le opere esistenti.</p></div>
-        <div class="route-map" role="group" aria-label="Schema indicativo di alcune località attraversate dalla ferrovia Chivasso–Asti, non in scala">
-          <div class="route-titles"><strong>IL TRACCIATO DELLA PROPOSTA</strong><span>Schema indicativo · Scorri lateralmente da telefono →</span></div>
-          <ol class="stations"><li><strong>Chivasso</strong></li><li><strong>San Sebastiano da Po</strong></li><li><strong>Lauriano</strong></li><li><strong>Monteu da Po</strong></li><li><strong>Cavagnolo–Brusasco</strong></li><li><strong>Brozolo</strong></li><li><strong>Cocconato</strong></li><li><strong>Montiglio</strong></li><li><strong>Asti</strong></li></ol>
-          <div class="route-foot"><span>Sono mostrate soltanto alcune località attraversate: lo schema non rappresenta tutte le fermate né le distanze.</span><span>≈ 51,3 km</span></div>
+        <div class="route-map" role="group" aria-label="Elenco delle 17 stazioni e fermate storiche della ferrovia Chivasso–Asti, da nord a sud, non in scala">
+          <div class="route-titles"><strong>LE STAZIONI E FERMATE STORICHE</strong><span>17 località lungo la linea · in ordine da Chivasso ad Asti</span></div>
+          <div class="stations-scroll" role="region" aria-label="Stazioni e fermate storiche in ordine di percorso" tabindex="0">
+            <ol class="stations">
+              <li><strong>Chivasso</strong></li>
+              <li><strong>San Sebastiano Po</strong></li>
+              <li><strong>Lauriano</strong></li>
+              <li><strong>Monteu da Po</strong></li>
+              <li><strong>Cavagnolo–Brusasco</strong></li>
+              <li><strong>Brozolo</strong></li>
+              <li><strong>Cocconito–Bonvino</strong></li>
+              <li><strong>Cocconato</strong></li>
+              <li><strong>Sant’Anna–Robella</strong></li>
+              <li><strong>Montiglio–Murisengo</strong></li>
+              <li><strong>Cunico–Scandeluzza</strong></li>
+              <li><strong>Montechiaro d’Asti</strong></li>
+              <li><strong>Chiusano–Cossombrato</strong></li>
+              <li><strong>Settime–Cinaglio–Mombarone</strong></li>
+              <li><strong>Serravalle d’Asti</strong></li>
+              <li><strong>Sessant</strong></li>
+              <li><strong>Asti</strong></li>
+            </ol>
+          </div>
+          <div class="route-foot"><span>Elenco storico, non elenco delle fermate servite oggi. Sessant fu soppressa nel 2003. Schema non in scala. Fonte: <a href="https://www.fondazionefs.it/content/dam/fondazionefs/fondazione-fs-new/hp-la-fondazione/binari-senza-tempo/Atlante_smart_mod.pdf" target="_blank" rel="noopener noreferrer" style="color:#d5f478">Atlante Fondazione FS</a>.</span><span>≈ 51,3 km</span></div>
         </div>
       </div>
     </section>
