@@ -9,6 +9,7 @@
     counters.forEach(el => { el.textContent = "—"; el.dataset.counterState = "unavailable"; });
     dates.forEach(el => el.textContent = closed ? "Raccolta non ancora aperta" : "Conteggio temporaneamente non disponibile");
   }
+  async function aggiornaContatore() {
   try {
     const res = await fetch("https://raw.githubusercontent.com/SYSTEMTOOLBOX/ciclovia-per-la-vita/main/adesioni-count.json", {cache: "no-store"});
     if (!res.ok) throw new Error("Conteggio non raggiungibile");
@@ -27,4 +28,14 @@
   } catch (_) {
     fallback();
   }
+  }
+  // Il totale viene ricaricato quando si ritorna sulla pagina e mentre è visibile.
+  // La fonte pubblica è aggregata e aggiornata periodicamente, non in tempo reale.
+  void aggiornaContatore();
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) void aggiornaContatore();
+  });
+  setInterval(() => {
+    if (!document.hidden) void aggiornaContatore();
+  }, 120000);
 })();
