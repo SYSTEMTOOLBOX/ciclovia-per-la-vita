@@ -8,7 +8,8 @@ on:
         type: boolean
         default: true
   schedule:
-    - cron: "23 * * * *"
+    # Aggiornamento aggregato circa ogni 15 minuti; la schedulazione può slittare.
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
