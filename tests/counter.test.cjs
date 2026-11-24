@@ -12,7 +12,13 @@ test('mostra conteggio verificato, incluso zero reale',async()=>{
   for(const count of [0,1234]) assert.equal((await render({status:'verified',count,updatedAt:new Date().toISOString()})).count,new Intl.NumberFormat('it-IT').format(count));
 });
 test('non inventa totali con rete assente, dati invalidi o obsoleti',async()=>{
-  for(const value of [-1,1.5,'5']) assert.equal((await render({status:'verified',count:value,updatedAt:new Date().toISOString()})).count,'Non disponibile');
-  assert.equal((await render({status:'verified',count:1,updatedAt:'2000-01-01'})).count,'Non disponibile');
+  for(const value of [-1,1.5,'5']) assert.equal((await render({status:'verified',count:value,updatedAt:new Date().toISOString()})).count,'—');
+  assert.equal((await render({status:'verified',count:1,updatedAt:'2000-01-01'})).count,'—');
   assert.match((await render(null,true)).date,/temporaneamente/);
+});
+
+test('prima dell’apertura non mostra un numero inventato',async()=>{
+  const result=await render({status:'pending',count:null,updatedAt:null});
+  assert.equal(result.count,'—');
+  assert.match(result.date,/non ancora aperta/);
 });
